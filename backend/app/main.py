@@ -53,7 +53,9 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Next.js dev server
         "http://127.0.0.1:3000",
+        "https://*.vercel.app",  # Vercel deployments
     ],
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Match all Vercel subdomains
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
