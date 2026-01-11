@@ -2,6 +2,8 @@
 
 A web application for psychometric assessment of Large Language Models. Ethics Engine applies validated psychological instruments (authoritarianism scales, moral foundations questionnaires, personality inventories) to LLMs, measuring how models respond across different ideological framings.
 
+**Live Demo**: [ethicsengine.eduba.io](https://ethicsengine.eduba.io) *(or your Vercel URL)*
+
 ## Features
 
 - **10 Built-in Psychometric Scales**: RWA, LWA, MFQ, NFC, BFI-10, SDO-7, RSES, GSE, LOT-R, and more
