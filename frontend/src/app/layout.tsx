@@ -47,7 +47,7 @@ export default function RootLayout({
 
                 <div className="flex items-center gap-1">
                   <a
-                    href="https://github.com"
+                    href="https://github.com/RinDig/AuditEngine"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
@@ -58,13 +58,15 @@ export default function RootLayout({
                     GitHub
                   </a>
                   <a
-                    href="#"
+                    href="https://eduba.io"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
-                    Docs
+                    Eduba.io
                   </a>
                 </div>
               </div>
@@ -103,7 +105,7 @@ export default function RootLayout({
                 </p>
                 <div className="flex items-center gap-6 text-sm text-gray-500">
                   <span>v1.0.0</span>
-                  <a href="#" className="hover:text-gray-900 transition-colors">MIT License</a>
+                  <a href="https://github.com/RinDig/AuditEngine/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">MIT License</a>
                 </div>
               </div>
             </div>
