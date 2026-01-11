@@ -54,8 +54,10 @@ app.add_middleware(
         "http://localhost:3000",  # Next.js dev server
         "http://127.0.0.1:3000",
         "https://*.vercel.app",  # Vercel deployments
+        "https://eduba.io",  # Production domain
+        "https://*.eduba.io",  # Production subdomains
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Match all Vercel subdomains
+    allow_origin_regex=r"https://.*\.(vercel\.app|eduba\.io)",  # Match Vercel and eduba.io
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
