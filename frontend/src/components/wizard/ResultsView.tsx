@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui'
 import type { Job, JobSummary } from '@/lib/types'
 import { formatNumber, formatTimestamp } from '@/lib/utils'
 import { getResultsDownloadUrl } from '@/lib/api'
+import { ResultsCharts } from './ResultsCharts'
 
 interface ResultsViewProps {
   job: Job
@@ -12,6 +14,8 @@ interface ResultsViewProps {
 }
 
 export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps) {
+  const [showVisualizations, setShowVisualizations] = useState(true)
+
   const handleDownload = (format: 'csv' | 'json') => {
     window.open(getResultsDownloadUrl(job.id, format), '_blank')
   }
@@ -19,6 +23,9 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
   const successRate = summary && summary.total_responses > 0
     ? ((summary.total_responses - summary.parse_warnings) / summary.total_responses) * 100
     : 0
+
+  // Check if we have statistics data for visualizations
+  const hasStatistics = summary?.statistics && Object.keys(summary.statistics).length > 0
 
   return (
     <div className="space-y-6 animate-in">
@@ -135,28 +142,82 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
             </div>
           </div>
 
-          {/* Statistics by model/persona/scale */}
-          {summary.statistics && Object.keys(summary.statistics).length > 0 && (
-            <>
-              <div className="divider" />
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-semibold text-text-primary">
-                    Detailed Statistics
-                  </h4>
-                  <span className="badge-neutral">
-                    {Object.keys(summary.statistics).length} models
-                  </span>
-                </div>
-                <div className="code-block max-h-96 overflow-y-auto">
-                  <pre className="text-xs">
-                    {JSON.stringify(summary.statistics, null, 2)}
-                  </pre>
-                </div>
+        </div>
+      )}
+
+      {/* Visualizations Section */}
+      {job.status === 'completed' && hasStatistics && (
+        <div className="card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                <svg className="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
               </div>
-            </>
+              <div>
+                <h3 className="text-base font-semibold text-text-primary">
+                  Visualizations
+                </h3>
+                <p className="text-sm text-text-secondary">
+                  Interactive charts to explore your results
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowVisualizations(!showVisualizations)}
+              className="text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1"
+            >
+              {showVisualizations ? 'Hide' : 'Show'}
+              <svg
+                className={`w-4 h-4 transition-transform ${showVisualizations ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+
+          {showVisualizations && (
+            <ResultsCharts
+              statistics={summary.statistics as any}
+              scales={job.config.scales}
+              models={job.config.models}
+              personas={job.config.personas}
+            />
           )}
         </div>
+      )}
+
+      {/* Raw Statistics (collapsible) */}
+      {job.status === 'completed' && hasStatistics && (
+        <details className="card p-6">
+          <summary className="flex items-center gap-3 cursor-pointer list-none">
+            <div className="w-8 h-8 rounded-lg bg-surface-muted flex items-center justify-center">
+              <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-text-primary">
+                Raw Statistics Data
+              </h4>
+              <p className="text-xs text-text-secondary">
+                Click to view JSON data
+              </p>
+            </div>
+            <span className="badge-neutral">
+              {Object.keys(summary.statistics).length} models
+            </span>
+          </summary>
+          <div className="mt-4 code-block max-h-96 overflow-y-auto">
+            <pre className="text-xs">
+              {JSON.stringify(summary.statistics, null, 2)}
+            </pre>
+          </div>
+        </details>
       )}
 
       {/* Download Section */}
