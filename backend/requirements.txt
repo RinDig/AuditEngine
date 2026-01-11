@@ -1,0 +1,26 @@
+# Ethics Engine Backend Dependencies
+
+# Web Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Data Validation
+pydantic>=2.5.0
+
+# LLM Provider SDKs
+openai>=1.12.0
+anthropic>=0.18.0
+google-genai>=1.0.0
+
+# Data Formats
+pyyaml>=6.0.1
+
+# Async HTTP (for custom endpoints)
+httpx>=0.26.0
+
+# Development
+python-dotenv>=1.0.0
+
+# Testing (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.23.0

@@ -1,0 +1,103 @@
+"""
+Anthropic provider client.
+
+Uses the official anthropic Python library with async support.
+"""
+
+import time
+from typing import Optional
+
+from anthropic import AsyncAnthropic, APIError, AuthenticationError
+
+from .base import BaseLLMProvider, LLMResponse
+
+
+class AnthropicProvider(BaseLLMProvider):
+    """Anthropic API client."""
+
+    AVAILABLE_MODELS = [
+        # Claude 4.5 Series (Latest - November 2025)
+        "claude-opus-4-5-20251124",
+        "claude-sonnet-4-5-20251022",
+        "claude-haiku-4-5-20251015",
+        # Claude 4 Series
+        "claude-sonnet-4-20250514",
+        "claude-opus-4-20250514",
+        # Claude 3.5 Series
+        "claude-3-5-sonnet-latest",
+        "claude-3-5-sonnet-20241022",
+        "claude-3-5-haiku-latest",
+        "claude-3-5-haiku-20241022",
+        # Claude 3 Series
+        "claude-3-opus-latest",
+        "claude-3-opus-20240229",
+        "claude-3-sonnet-20240229",
+        "claude-3-haiku-20240307",
+    ]
+
+    def __init__(self, api_key: str, base_url: Optional[str] = None):
+        super().__init__(api_key, base_url)
+        self.client = AsyncAnthropic(
+            api_key=api_key,
+            base_url=base_url
+        )
+
+    @property
+    def provider_name(self) -> str:
+        return "anthropic"
+
+    @property
+    def available_models(self) -> list[str]:
+        return self.AVAILABLE_MODELS
+
+    async def complete(
+        self,
+        prompt: str,
+        model: str,
+        temperature: float = 0.0,
+        max_tokens: int = 500
+    ) -> LLMResponse:
+        """Send completion request to Anthropic."""
+        start_time = time.perf_counter()
+
+        response = await self.client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        duration_ms = int((time.perf_counter() - start_time) * 1000)
+
+        # Extract text from response
+        text = ""
+        if response.content:
+            text = response.content[0].text if response.content[0].type == "text" else ""
+
+        # Calculate tokens
+        tokens_used = (response.usage.input_tokens + response.usage.output_tokens) if response.usage else 0
+
+        return LLMResponse(
+            text=text,
+            model=response.model,
+            tokens_used=tokens_used,
+            duration_ms=duration_ms,
+            raw_response=response.model_dump()
+        )
+
+    async def validate_key(self) -> tuple[bool, Optional[str]]:
+        """Validate Anthropic API key with a minimal request."""
+        try:
+            # Send a minimal message to validate
+            await self.client.messages.create(
+                model="claude-3-haiku-20240307",
+                max_tokens=10,
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+            return True, None
+        except AuthenticationError as e:
+            return False, f"Invalid API key: {str(e)}"
+        except APIError as e:
+            return False, f"API error: {str(e)}"
+        except Exception as e:
+            return False, f"Unexpected error: {str(e)}"
