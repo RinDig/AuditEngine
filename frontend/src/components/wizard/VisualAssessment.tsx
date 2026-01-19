@@ -79,6 +79,28 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
     return models
   }, [apiKeys])
 
+  // Get connected providers with vision models
+  const connectedVisionProviders = useCallback(() => {
+    return PROVIDERS.filter(p => {
+      const keyState = apiKeys[p.id]
+      const visionModels = VisionModels[p.id] || []
+      return keyState?.status === 'valid' && visionModels.length > 0
+    })
+  }, [apiKeys])
+
+  // Select/deselect all models for a provider
+  const selectAllForProvider = (providerId: ProviderType) => {
+    const providerModels = VisionModels[providerId] || []
+    const allSelected = providerModels.every((m) => selectedModels.includes(m))
+
+    if (allSelected) {
+      setSelectedModels(prev => prev.filter((m) => !providerModels.includes(m)))
+    } else {
+      const newModels = providerModels.filter((m) => !selectedModels.includes(m))
+      setSelectedModels(prev => [...prev, ...newModels])
+    }
+  }
+
   // Handle image upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -321,56 +343,125 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
           </p>
         </div>
 
-        {/* Model Selection */}
-        <div className="card p-6">
-          <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-            </svg>
-            Vision-Capable Models
-            <span className="badge-neutral ml-2">{selectedModels.length} selected</span>
-          </h3>
-
-          {visionModels.length === 0 ? (
-            <p className="text-text-secondary text-sm">
-              No vision-capable models available. Please add API keys for OpenAI, Anthropic, or Gemini.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              {visionModels.map(({ provider, model }) => (
-                <label
-                  key={`${provider}-${model}`}
-                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    selectedModels.includes(model)
-                      ? 'border-accent bg-accent/5'
-                      : 'border-border-primary hover:border-border-secondary'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedModels.includes(model)}
-                    onChange={() => toggleModel(model)}
-                    className="sr-only"
-                  />
-                  <div className={`w-4 h-4 rounded border flex items-center justify-center ${
-                    selectedModels.includes(model)
-                      ? 'bg-accent border-accent'
-                      : 'border-border-secondary'
-                  }`}>
-                    {selectedModels.includes(model) && (
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text-primary truncate">{model}</p>
-                    <p className="text-xs text-text-tertiary capitalize">{provider}</p>
-                  </div>
-                </label>
-              ))}
+        {/* Model Selection - Grouped by Provider */}
+        <div className="card overflow-hidden">
+          {/* Header */}
+          <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text-primary">Vision-Capable Models</h3>
+                  <p className="text-sm text-text-secondary">
+                    {selectedModels.length > 0
+                      ? `${selectedModels.length} model${selectedModels.length !== 1 ? 's' : ''} selected`
+                      : connectedVisionProviders().length === 0
+                        ? 'Connect API keys above to see available models'
+                        : 'Select models to include in this assessment'}
+                  </p>
+                </div>
+              </div>
+              {selectedModels.length > 0 && (
+                <span className="badge-info">
+                  {selectedModels.length} selected
+                </span>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            {connectedVisionProviders().length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <p className="text-sm text-text-secondary mb-2">No vision-capable providers connected</p>
+                <p className="text-xs text-text-tertiary">
+                  Add API keys for OpenAI, Anthropic, Gemini, or Groq to see vision models.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {connectedVisionProviders().map((provider) => {
+                  const models = VisionModels[provider.id] || []
+                  if (models.length === 0) return null
+
+                  const selectedCount = models.filter((m) => selectedModels.includes(m)).length
+                  const allSelected = selectedCount === models.length
+
+                  return (
+                    <div key={provider.id} className="space-y-3">
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold text-text-primary">
+                              {provider.name}
+                            </h4>
+                            <p className="text-xs text-text-secondary">
+                              {selectedCount} of {models.length} selected
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => selectAllForProvider(provider.id)}
+                          className="text-xs font-medium text-accent hover:text-accent-hover px-3 py-1.5 rounded-lg hover:bg-accent/5 transition-colors"
+                        >
+                          {allSelected ? 'Deselect all' : 'Select all'}
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {models.map((model) => {
+                          const isSelected = selectedModels.includes(model)
+                          return (
+                            <div
+                              key={model}
+                              onClick={() => toggleModel(model)}
+                              className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                                isSelected
+                                  ? 'border-accent bg-accent/5'
+                                  : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:bg-white'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all ${
+                                  isSelected
+                                    ? 'bg-accent text-white'
+                                    : 'bg-white border-2 border-gray-200'
+                                }`}>
+                                  {isSelected && (
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </div>
+                                <span className="text-xs text-text-primary font-mono truncate">
+                                  {model}
+                                </span>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Persona Selection */}

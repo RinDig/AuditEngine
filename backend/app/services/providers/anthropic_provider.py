@@ -19,38 +19,32 @@ class AnthropicProvider(BaseLLMProvider):
     AVAILABLE_MODELS = [
         # Claude 4.5 Series (Latest - November 2025)
         "claude-opus-4-5-20251124",
-        "claude-sonnet-4-5-20251022",
         "claude-haiku-4-5-20251015",
         # Claude 4 Series
         "claude-sonnet-4-20250514",
         "claude-opus-4-20250514",
-        # Claude 3.5 Series
+        "claude-opus-4-1-20250805",
+        # Claude 3.5 Series (legacy)
         "claude-3-5-sonnet-latest",
         "claude-3-5-sonnet-20241022",
         "claude-3-5-haiku-latest",
         "claude-3-5-haiku-20241022",
-        # Claude 3 Series
-        "claude-3-opus-latest",
-        "claude-3-opus-20240229",
-        "claude-3-sonnet-20240229",
-        "claude-3-haiku-20240307",
     ]
 
     # All Claude 3+ models support vision
     VISION_MODELS = [
+        # Claude 4.5 Series
         "claude-opus-4-5-20251124",
-        "claude-sonnet-4-5-20251022",
         "claude-haiku-4-5-20251015",
+        # Claude 4 Series
         "claude-sonnet-4-20250514",
         "claude-opus-4-20250514",
+        "claude-opus-4-1-20250805",
+        # Claude 3.5 Series (legacy)
         "claude-3-5-sonnet-latest",
         "claude-3-5-sonnet-20241022",
         "claude-3-5-haiku-latest",
         "claude-3-5-haiku-20241022",
-        "claude-3-opus-latest",
-        "claude-3-opus-20240229",
-        "claude-3-sonnet-20240229",
-        "claude-3-haiku-20240307",
     ]
 
     def __init__(self, api_key: str, base_url: Optional[str] = None):

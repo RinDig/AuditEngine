@@ -16,34 +16,26 @@ class OpenAIProvider(BaseLLMProvider):
     """OpenAI API client."""
 
     AVAILABLE_MODELS = [
-        # GPT-5.2 Series (Latest - January 2026)
-        "gpt-5.2",
-        "gpt-5.2-chat-latest",
-        "gpt-5.2-pro",
-        # GPT-5.1 Series
-        "gpt-5.1",
-        "gpt-5.1-chat-latest",
-        # GPT-5 Series
+        # GPT-5 Series (Latest)
         "gpt-5",
         "gpt-5-mini",
         "gpt-5-nano",
-        # GPT-4o Series
-        "gpt-4o",
-        "gpt-4o-mini",
-        "gpt-4o-2024-11-20",
-        "gpt-4o-2024-08-06",
         # GPT-4.1 Series
         "gpt-4.1",
         "gpt-4.1-mini",
         "gpt-4.1-nano",
+        # GPT-4o Series
+        "gpt-4o",
+        "gpt-4o-mini",
         # O-Series (Reasoning)
+        "o3",
+        "o3-mini",
+        "o4-mini",
         "o1",
         "o1-mini",
-        "o1-preview",
-        "o3-mini",
+        "o1-pro",
         # GPT-4 Legacy
         "gpt-4-turbo",
-        "gpt-4-turbo-preview",
         "gpt-4",
         # GPT-3.5
         "gpt-3.5-turbo",
@@ -51,22 +43,25 @@ class OpenAIProvider(BaseLLMProvider):
 
     # Models that support vision/image input
     VISION_MODELS = [
-        "gpt-5.2",
-        "gpt-5.2-chat-latest",
-        "gpt-5.2-pro",
-        "gpt-5.1",
-        "gpt-5.1-chat-latest",
+        # GPT-5 Series
         "gpt-5",
         "gpt-5-mini",
-        "gpt-4o",
-        "gpt-4o-mini",
-        "gpt-4o-2024-11-20",
-        "gpt-4o-2024-08-06",
+        "gpt-5-nano",
+        # GPT-4.1 Series
         "gpt-4.1",
         "gpt-4.1-mini",
-        "gpt-4-turbo",
+        "gpt-4.1-nano",
+        # GPT-4o Series
+        "gpt-4o",
+        "gpt-4o-mini",
+        # O-Series (Reasoning)
+        "o3",
+        "o3-mini",
+        "o4-mini",
         "o1",
-        "o1-preview",
+        "o1-mini",
+        # GPT-4 Legacy
+        "gpt-4-turbo",
     ]
 
     def __init__(self, api_key: str, base_url: Optional[str] = None):

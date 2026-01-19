@@ -18,29 +18,32 @@ class GeminiProvider(BaseLLMProvider):
     """Google Gemini API client."""
 
     AVAILABLE_MODELS = [
-        # Gemini 2.5 Series (Latest)
+        # Gemini 3 Series (Latest - November 2025)
+        "gemini-3-pro",
+        "gemini-3-flash",
+        "gemini-3-deep-think",
+        # Gemini 2.5 Series
+        "gemini-2.5-pro",
         "gemini-2.5-flash",
         "gemini-2.5-flash-lite",
-        "gemini-2.5-pro",
-        # Gemini 2.0 Series
+        # Gemini 2.0 Series (retiring March 2026)
         "gemini-2.0-flash",
         "gemini-2.0-flash-lite",
-        # Gemini 1.5 Series
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-1.5-pro",
     ]
 
     # All Gemini models support vision natively
     VISION_MODELS = [
+        # Gemini 3 Series
+        "gemini-3-pro",
+        "gemini-3-flash",
+        "gemini-3-deep-think",
+        # Gemini 2.5 Series
+        "gemini-2.5-pro",
         "gemini-2.5-flash",
         "gemini-2.5-flash-lite",
-        "gemini-2.5-pro",
+        # Gemini 2.0 Series
         "gemini-2.0-flash",
         "gemini-2.0-flash-lite",
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-1.5-pro",
     ]
 
     def __init__(self, api_key: str, base_url: Optional[str] = None):
