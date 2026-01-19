@@ -16,10 +16,15 @@ class OpenAIProvider(BaseLLMProvider):
     """OpenAI API client."""
 
     AVAILABLE_MODELS = [
-        # GPT-5 Series (Latest)
+        # GPT-5.2 Series (Latest - December 2025)
+        "gpt-5.2",
+        # GPT-5.1 Series
+        "gpt-5.1",
+        # GPT-5 Series
         "gpt-5",
         "gpt-5-mini",
         "gpt-5-nano",
+        "gpt-5-pro",
         # GPT-4.1 Series
         "gpt-4.1",
         "gpt-4.1-mini",
@@ -33,7 +38,6 @@ class OpenAIProvider(BaseLLMProvider):
         "o4-mini",
         "o1",
         "o1-mini",
-        "o1-pro",
         # GPT-4 Legacy
         "gpt-4-turbo",
         "gpt-4",
@@ -43,10 +47,14 @@ class OpenAIProvider(BaseLLMProvider):
 
     # Models that support vision/image input
     VISION_MODELS = [
+        # GPT-5.2 Series (Latest - December 2025)
+        "gpt-5.2",
+        # GPT-5.1 Series
+        "gpt-5.1",
         # GPT-5 Series
         "gpt-5",
         "gpt-5-mini",
-        "gpt-5-nano",
+        "gpt-5-pro",
         # GPT-4.1 Series
         "gpt-4.1",
         "gpt-4.1-mini",
@@ -54,9 +62,8 @@ class OpenAIProvider(BaseLLMProvider):
         # GPT-4o Series
         "gpt-4o",
         "gpt-4o-mini",
-        # O-Series (Reasoning)
+        # O-Series (Reasoning with Vision - o3 and o4-mini can "think with images")
         "o3",
-        "o3-mini",
         "o4-mini",
         "o1",
         "o1-mini",

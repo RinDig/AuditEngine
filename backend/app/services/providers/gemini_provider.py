@@ -18,11 +18,7 @@ class GeminiProvider(BaseLLMProvider):
     """Google Gemini API client."""
 
     AVAILABLE_MODELS = [
-        # Gemini 3 Series (Latest - November 2025)
-        "gemini-3-pro",
-        "gemini-3-flash",
-        "gemini-3-deep-think",
-        # Gemini 2.5 Series
+        # Gemini 2.5 Series (Latest)
         "gemini-2.5-pro",
         "gemini-2.5-flash",
         "gemini-2.5-flash-lite",
@@ -33,10 +29,6 @@ class GeminiProvider(BaseLLMProvider):
 
     # All Gemini models support vision natively
     VISION_MODELS = [
-        # Gemini 3 Series
-        "gemini-3-pro",
-        "gemini-3-flash",
-        "gemini-3-deep-think",
         # Gemini 2.5 Series
         "gemini-2.5-pro",
         "gemini-2.5-flash",

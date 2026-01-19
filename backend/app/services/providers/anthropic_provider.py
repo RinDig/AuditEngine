@@ -18,31 +18,45 @@ class AnthropicProvider(BaseLLMProvider):
 
     AVAILABLE_MODELS = [
         # Claude 4.5 Series (Latest - November 2025)
-        "claude-opus-4-5-20251124",
-        "claude-haiku-4-5-20251015",
+        "claude-opus-4-5-20251101",
+        "claude-opus-4-5",
+        "claude-sonnet-4-5-20250929",
+        "claude-sonnet-4-5",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5",
         # Claude 4 Series
         "claude-sonnet-4-20250514",
+        "claude-sonnet-4-0",
         "claude-opus-4-20250514",
+        "claude-opus-4-0",
         "claude-opus-4-1-20250805",
+        # Claude 3.7 Series
+        "claude-3-7-sonnet-latest",
+        "claude-3-7-sonnet-20250219",
         # Claude 3.5 Series (legacy)
-        "claude-3-5-sonnet-latest",
-        "claude-3-5-sonnet-20241022",
         "claude-3-5-haiku-latest",
         "claude-3-5-haiku-20241022",
     ]
 
     # All Claude 3+ models support vision
     VISION_MODELS = [
-        # Claude 4.5 Series
-        "claude-opus-4-5-20251124",
-        "claude-haiku-4-5-20251015",
+        # Claude 4.5 Series (Latest - November 2025)
+        "claude-opus-4-5-20251101",
+        "claude-opus-4-5",
+        "claude-sonnet-4-5-20250929",
+        "claude-sonnet-4-5",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5",
         # Claude 4 Series
         "claude-sonnet-4-20250514",
+        "claude-sonnet-4-0",
         "claude-opus-4-20250514",
+        "claude-opus-4-0",
         "claude-opus-4-1-20250805",
+        # Claude 3.7 Series
+        "claude-3-7-sonnet-latest",
+        "claude-3-7-sonnet-20250219",
         # Claude 3.5 Series (legacy)
-        "claude-3-5-sonnet-latest",
-        "claude-3-5-sonnet-20241022",
         "claude-3-5-haiku-latest",
         "claude-3-5-haiku-20241022",
     ]

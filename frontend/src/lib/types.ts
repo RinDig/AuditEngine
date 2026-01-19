@@ -249,29 +249,36 @@ export interface VisualJobSummary {
 // Vision-capable models by provider
 export const VISION_MODELS: Record<ProviderType, string[]> = {
   openai: [
+    // GPT-5.2 Series (Latest - December 2025)
+    'gpt-5.2',
+    // GPT-5.1 Series
+    'gpt-5.1',
     // GPT-5 Series
-    'gpt-5', 'gpt-5-mini', 'gpt-5-nano',
+    'gpt-5', 'gpt-5-mini', 'gpt-5-pro',
     // GPT-4.1 Series
     'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
     // GPT-4o Series
     'gpt-4o', 'gpt-4o-mini',
-    // O-Series (Reasoning)
-    'o3', 'o3-mini', 'o4-mini', 'o1', 'o1-mini',
+    // O-Series (Reasoning with Vision)
+    'o3', 'o4-mini', 'o1', 'o1-mini',
     // GPT-4 Legacy
     'gpt-4-turbo',
   ],
   anthropic: [
-    // Claude 4.5 Series
-    'claude-opus-4-5-20251124', 'claude-haiku-4-5-20251015',
+    // Claude 4.5 Series (Latest - November 2025)
+    'claude-opus-4-5-20251101', 'claude-opus-4-5',
+    'claude-sonnet-4-5-20250929', 'claude-sonnet-4-5',
+    'claude-haiku-4-5-20251001', 'claude-haiku-4-5',
     // Claude 4 Series
-    'claude-sonnet-4-20250514', 'claude-opus-4-20250514', 'claude-opus-4-1-20250805',
+    'claude-sonnet-4-20250514', 'claude-sonnet-4-0',
+    'claude-opus-4-20250514', 'claude-opus-4-0',
+    'claude-opus-4-1-20250805',
+    // Claude 3.7 Series
+    'claude-3-7-sonnet-latest', 'claude-3-7-sonnet-20250219',
     // Claude 3.5 Series (legacy)
-    'claude-3-5-sonnet-latest', 'claude-3-5-sonnet-20241022',
     'claude-3-5-haiku-latest', 'claude-3-5-haiku-20241022',
   ],
   gemini: [
-    // Gemini 3 Series
-    'gemini-3-pro', 'gemini-3-flash', 'gemini-3-deep-think',
     // Gemini 2.5 Series
     'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite',
     // Gemini 2.0 Series (retiring March 2026)
@@ -287,16 +294,20 @@ export const PROVIDERS: ProviderInfo[] = [
   {
     id: 'openai',
     name: 'OpenAI',
-    description: 'GPT-5, GPT-4.1, GPT-4o, O-series models',
+    description: 'GPT-5.2, GPT-5.1, GPT-5, GPT-4.1, O-series models',
     models: [
-      // GPT-5 Series (Latest)
-      'gpt-5', 'gpt-5-mini', 'gpt-5-nano',
+      // GPT-5.2 Series (Latest - December 2025)
+      'gpt-5.2',
+      // GPT-5.1 Series
+      'gpt-5.1',
+      // GPT-5 Series
+      'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro',
       // GPT-4.1 Series
       'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
       // GPT-4o Series
       'gpt-4o', 'gpt-4o-mini',
       // O-Series (Reasoning)
-      'o3', 'o3-mini', 'o4-mini', 'o1', 'o1-mini', 'o1-pro',
+      'o3', 'o3-mini', 'o4-mini', 'o1', 'o1-mini',
       // GPT-4 Legacy
       'gpt-4-turbo', 'gpt-4',
       // GPT-3.5
@@ -307,14 +318,19 @@ export const PROVIDERS: ProviderInfo[] = [
   {
     id: 'anthropic',
     name: 'Anthropic',
-    description: 'Claude 4.5, Claude 4, Claude 3.5 models',
+    description: 'Claude 4.5, Claude 4, Claude 3.7, Claude 3.5 models',
     models: [
-      // Claude 4.5 Series (Latest)
-      'claude-opus-4-5-20251124', 'claude-haiku-4-5-20251015',
+      // Claude 4.5 Series (Latest - November 2025)
+      'claude-opus-4-5-20251101', 'claude-opus-4-5',
+      'claude-sonnet-4-5-20250929', 'claude-sonnet-4-5',
+      'claude-haiku-4-5-20251001', 'claude-haiku-4-5',
       // Claude 4 Series
-      'claude-sonnet-4-20250514', 'claude-opus-4-20250514', 'claude-opus-4-1-20250805',
+      'claude-sonnet-4-20250514', 'claude-sonnet-4-0',
+      'claude-opus-4-20250514', 'claude-opus-4-0',
+      'claude-opus-4-1-20250805',
+      // Claude 3.7 Series
+      'claude-3-7-sonnet-latest', 'claude-3-7-sonnet-20250219',
       // Claude 3.5 Series (legacy)
-      'claude-3-5-sonnet-latest', 'claude-3-5-sonnet-20241022',
       'claude-3-5-haiku-latest', 'claude-3-5-haiku-20241022',
     ],
     requires_base_url: false,
@@ -331,10 +347,8 @@ export const PROVIDERS: ProviderInfo[] = [
   {
     id: 'gemini',
     name: 'Google Gemini',
-    description: 'Gemini 3, 2.5, and 2.0 models',
+    description: 'Gemini 2.5 and 2.0 models',
     models: [
-      // Gemini 3 Series (Latest)
-      'gemini-3-pro', 'gemini-3-flash', 'gemini-3-deep-think',
       // Gemini 2.5 Series
       'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite',
       // Gemini 2.0 Series
