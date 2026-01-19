@@ -46,14 +46,21 @@ class DeepSeekProvider(BaseLLMProvider):
         prompt: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 500
+        max_tokens: int = 500,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """Send completion request to DeepSeek."""
         start_time = time.perf_counter()
 
+        # Build messages with optional system prompt
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
         response = await self.client.chat.completions.create(
             model=model,
-            messages=[{"role": "user", "content": prompt}],
+            messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
         )

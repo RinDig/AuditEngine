@@ -85,17 +85,23 @@ class AnthropicProvider(BaseLLMProvider):
         prompt: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 500
+        max_tokens: int = 500,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """Send completion request to Anthropic."""
         start_time = time.perf_counter()
 
-        response = await self.client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            messages=[{"role": "user", "content": prompt}]
-        )
+        # Build request with optional system prompt
+        request_params = {
+            "model": model,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        if system_prompt:
+            request_params["system"] = system_prompt
+
+        response = await self.client.messages.create(**request_params)
 
         duration_ms = int((time.perf_counter() - start_time) * 1000)
 
@@ -121,7 +127,8 @@ class AnthropicProvider(BaseLLMProvider):
         image_data: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 1000
+        max_tokens: int = 1000,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """Send completion request with image to Anthropic."""
         if model not in self.VISION_MODELS:
@@ -166,12 +173,17 @@ class AnthropicProvider(BaseLLMProvider):
             }
         ]
 
-        response = await self.client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            messages=messages
-        )
+        # Build request with optional system prompt
+        request_params = {
+            "model": model,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "messages": messages
+        }
+        if system_prompt:
+            request_params["system"] = system_prompt
+
+        response = await self.client.messages.create(**request_params)
 
         duration_ms = int((time.perf_counter() - start_time) * 1000)
 

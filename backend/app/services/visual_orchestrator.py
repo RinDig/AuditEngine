@@ -23,6 +23,7 @@ from app.services.providers.base import BaseLLMProvider
 from app.services.providers.openai_provider import OpenAIProvider
 from app.services.providers.anthropic_provider import AnthropicProvider
 from app.services.providers.gemini_provider import GeminiProvider
+from app.services.providers.groq_provider import GroqProvider
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ PROVIDER_SEMAPHORES = {
     "openai": asyncio.Semaphore(3),
     "anthropic": asyncio.Semaphore(5),
     "gemini": asyncio.Semaphore(5),
+    "groq": asyncio.Semaphore(10),
 }
 
 # Rate limits (seconds between calls)
@@ -38,6 +40,7 @@ RATE_LIMITS = {
     "openai": 1.0,
     "anthropic": 0.5,
     "gemini": 0.5,
+    "groq": 0.1,
 }
 
 
@@ -71,6 +74,14 @@ def get_provider_for_model(model: str, api_keys: dict[str, APIKeyConfig]) -> Opt
         )
         if model in provider.vision_models:
             return provider, "gemini"
+
+    if "groq" in api_keys:
+        provider = GroqProvider(
+            api_key=api_keys["groq"].api_key.get_secret_value(),
+            base_url=api_keys["groq"].base_url
+        )
+        if model in provider.vision_models:
+            return provider, "groq"
 
     return None
 
@@ -150,16 +161,17 @@ async def run_visual_assessment(
 
         async with semaphore:
             try:
-                # Build prompt with persona prefix
-                full_prompt = f"{persona.prompt_prefix}\n\n{job.config.prompt}" if persona.prompt_prefix else job.config.prompt
+                # Get system prompt from persona (may be empty for minimal persona)
+                system_prompt = persona.prompt_prefix if persona.prompt_prefix else None
 
-                # Call the vision API
+                # Call the vision API with user prompt and system prompt
                 llm_response = await provider.complete_with_vision(
-                    prompt=full_prompt,
+                    prompt=job.config.prompt,
                     image_data=image_data,
                     model=model,
                     temperature=job.config.temperature,
                     max_tokens=1500,
+                    system_prompt=system_prompt,
                 )
 
                 # Create response record
@@ -226,6 +238,9 @@ def get_vision_models_for_providers(api_keys: list[APIKeyConfig]) -> dict[str, l
             result[provider_name] = provider.vision_models
         elif provider_name == "gemini":
             provider = GeminiProvider(api_key="dummy")
+            result[provider_name] = provider.vision_models
+        elif provider_name == "groq":
+            provider = GroqProvider(api_key="dummy")
             result[provider_name] = provider.vision_models
 
     return result

@@ -325,15 +325,16 @@ class Orchestrator:
     ) -> Optional[ResponseRecord]:
         """Execute a single task with exponential backoff retry."""
         provider = self.providers[task.provider_name]
-        prompt = self._build_prompt(task)
+        user_prompt, system_prompt = self._build_prompt(task)
 
         for attempt in range(MAX_RETRIES):
             try:
                 response = await provider.complete(
-                    prompt=prompt,
+                    prompt=user_prompt,
                     model=task.model_name,
                     temperature=task.temperature,
-                    max_tokens=500
+                    max_tokens=500,
+                    system_prompt=system_prompt
                 )
 
                 # Parse the response
@@ -389,16 +390,14 @@ class Orchestrator:
 
         return None
 
-    def _build_prompt(self, task: AssessmentTask) -> str:
+    def _build_prompt(self, task: AssessmentTask) -> tuple[str, Optional[str]]:
         """
-        Construct the full prompt sent to the model.
+        Construct the user prompt and system prompt sent to the model.
 
-        Structure:
-        1. Persona prefix (ideological framing)
-        2. Response format instructions
-        3. Question text
-        4. Scale information
-        5. Output format request (JSON preferred)
+        Returns:
+            Tuple of (user_prompt, system_prompt)
+            - user_prompt: Contains scale info, question, and format instructions
+            - system_prompt: Persona prefix for ideological framing (or None for minimal)
         """
         scale = task.scale
         persona = task.persona
@@ -415,18 +414,18 @@ class Orchestrator:
         else:
             scale_desc = f"{min_val} to {max_val}"
 
-        # Build the prompt
+        # Build the user prompt (no persona - that goes in system prompt)
         parts = []
-
-        # Persona prefix (may be empty for minimal persona)
-        if persona.prompt_prefix:
-            parts.append(persona.prompt_prefix)
-
         parts.append(f"Answer using this scale: {scale_desc}")
         parts.append(f"Question: {item.text}")
         parts.append('Please provide your response in JSON format: {"rating": <number>, "justification": "<brief explanation>"}')
 
-        return "\n\n".join(parts)
+        user_prompt = "\n\n".join(parts)
+
+        # System prompt is the persona prefix (may be None/empty for minimal persona)
+        system_prompt = persona.prompt_prefix if persona.prompt_prefix else None
+
+        return user_prompt, system_prompt
 
     def cancel(self, state: OrchestratorState):
         """Cancel an in-progress assessment."""

@@ -59,19 +59,25 @@ class GeminiProvider(BaseLLMProvider):
         prompt: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 500
+        max_tokens: int = 500,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """Send completion request to Gemini."""
         start_time = time.perf_counter()
+
+        # Build config with optional system instruction
+        config = types.GenerateContentConfig(
+            temperature=temperature,
+            max_output_tokens=max_tokens,
+        )
+        if system_prompt:
+            config.system_instruction = system_prompt
 
         # Use async client
         response = await self.client.aio.models.generate_content(
             model=model,
             contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=temperature,
-                max_output_tokens=max_tokens,
-            )
+            config=config
         )
 
         duration_ms = int((time.perf_counter() - start_time) * 1000)
@@ -101,7 +107,8 @@ class GeminiProvider(BaseLLMProvider):
         image_data: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 1000
+        max_tokens: int = 1000,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """Send completion request with image to Gemini."""
         if model not in self.VISION_MODELS:
@@ -133,13 +140,18 @@ class GeminiProvider(BaseLLMProvider):
         # Build content with image and text
         contents = [image_part, prompt]
 
+        # Build config with optional system instruction
+        config = types.GenerateContentConfig(
+            temperature=temperature,
+            max_output_tokens=max_tokens,
+        )
+        if system_prompt:
+            config.system_instruction = system_prompt
+
         response = await self.client.aio.models.generate_content(
             model=model,
             contents=contents,
-            config=types.GenerateContentConfig(
-                temperature=temperature,
-                max_output_tokens=max_tokens,
-            )
+            config=config
         )
 
         duration_ms = int((time.perf_counter() - start_time) * 1000)

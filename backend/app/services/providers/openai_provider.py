@@ -95,10 +95,17 @@ class OpenAIProvider(BaseLLMProvider):
         prompt: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 500
+        max_tokens: int = 500,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """Send completion request to OpenAI."""
         start_time = time.perf_counter()
+
+        # Build messages with optional system prompt
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
 
         # o1/o3 reasoning models and gpt-5.1/5.2 don't support temperature parameter
         # and require max_completion_tokens instead of max_tokens
@@ -109,21 +116,21 @@ class OpenAIProvider(BaseLLMProvider):
             # Reasoning models don't support temperature
             response = await self.client.chat.completions.create(
                 model=model,
-                messages=[{"role": "user", "content": prompt}],
+                messages=messages,
                 max_completion_tokens=max_tokens,
             )
         elif uses_max_completion_tokens:
             # GPT-5.1/5.2 support temperature but require max_completion_tokens
             response = await self.client.chat.completions.create(
                 model=model,
-                messages=[{"role": "user", "content": prompt}],
+                messages=messages,
                 temperature=temperature,
                 max_completion_tokens=max_tokens,
             )
         else:
             response = await self.client.chat.completions.create(
                 model=model,
-                messages=[{"role": "user", "content": prompt}],
+                messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
@@ -144,7 +151,8 @@ class OpenAIProvider(BaseLLMProvider):
         image_data: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 1000
+        max_tokens: int = 1000,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """Send completion request with image to OpenAI."""
         if model not in self.VISION_MODELS:
@@ -157,22 +165,25 @@ class OpenAIProvider(BaseLLMProvider):
             # Assume JPEG if no prefix
             image_data = f"data:image/jpeg;base64,{image_data}"
 
-        # Build message with image
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": image_data}
-                    },
-                    {
-                        "type": "text",
-                        "text": prompt
-                    }
-                ]
-            }
-        ]
+        # Build messages with optional system prompt
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+
+        # Add user message with image
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {"url": image_data}
+                },
+                {
+                    "type": "text",
+                    "text": prompt
+                }
+            ]
+        })
 
         # o1/o3/o4 reasoning models don't support temperature
         # gpt-5.1/5.2 require max_completion_tokens instead of max_tokens

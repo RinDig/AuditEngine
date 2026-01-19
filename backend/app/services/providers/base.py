@@ -59,16 +59,18 @@ class BaseLLMProvider(ABC):
         prompt: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 500
+        max_tokens: int = 500,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """
         Send a completion request to the LLM.
 
         Args:
-            prompt: The full prompt text
+            prompt: The user prompt text
             model: Model identifier
             temperature: Sampling temperature
             max_tokens: Maximum tokens in response
+            system_prompt: Optional system prompt for persona/framing
 
         Returns:
             LLMResponse with the model's response
@@ -81,17 +83,19 @@ class BaseLLMProvider(ABC):
         image_data: str,
         model: str,
         temperature: float = 0.0,
-        max_tokens: int = 1000
+        max_tokens: int = 1000,
+        system_prompt: Optional[str] = None
     ) -> LLMResponse:
         """
         Send a completion request with an image to the LLM.
 
         Args:
-            prompt: The prompt text
+            prompt: The user prompt text
             image_data: Base64-encoded image data (with or without data URI prefix)
             model: Model identifier (must be in vision_models)
             temperature: Sampling temperature
             max_tokens: Maximum tokens in response
+            system_prompt: Optional system prompt for persona/framing
 
         Returns:
             LLMResponse with the model's response
