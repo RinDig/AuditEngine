@@ -100,13 +100,24 @@ class OpenAIProvider(BaseLLMProvider):
         """Send completion request to OpenAI."""
         start_time = time.perf_counter()
 
-        # o1/o3 reasoning models don't support temperature parameter
-        is_reasoning_model = model.startswith("o1") or model.startswith("o3")
+        # o1/o3 reasoning models and gpt-5.1/5.2 don't support temperature parameter
+        # and require max_completion_tokens instead of max_tokens
+        is_reasoning_model = model.startswith("o1") or model.startswith("o3") or model.startswith("o4")
+        uses_max_completion_tokens = is_reasoning_model or model.startswith("gpt-5.1") or model.startswith("gpt-5.2")
 
         if is_reasoning_model:
+            # Reasoning models don't support temperature
             response = await self.client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
+                max_completion_tokens=max_tokens,
+            )
+        elif uses_max_completion_tokens:
+            # GPT-5.1/5.2 support temperature but require max_completion_tokens
+            response = await self.client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=temperature,
                 max_completion_tokens=max_tokens,
             )
         else:
@@ -163,13 +174,24 @@ class OpenAIProvider(BaseLLMProvider):
             }
         ]
 
-        # o1 models don't support temperature
-        is_reasoning_model = model.startswith("o1") or model.startswith("o3")
+        # o1/o3/o4 reasoning models don't support temperature
+        # gpt-5.1/5.2 require max_completion_tokens instead of max_tokens
+        is_reasoning_model = model.startswith("o1") or model.startswith("o3") or model.startswith("o4")
+        uses_max_completion_tokens = is_reasoning_model or model.startswith("gpt-5.1") or model.startswith("gpt-5.2")
 
         if is_reasoning_model:
+            # Reasoning models don't support temperature
             response = await self.client.chat.completions.create(
                 model=model,
                 messages=messages,
+                max_completion_tokens=max_tokens,
+            )
+        elif uses_max_completion_tokens:
+            # GPT-5.1/5.2 support temperature but require max_completion_tokens
+            response = await self.client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=temperature,
                 max_completion_tokens=max_tokens,
             )
         else:

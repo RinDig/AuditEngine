@@ -1,22 +1,22 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Button, Input } from '@/components/ui'
 import {
   createVisualJob,
   fetchVisualJob,
   fetchVisualJobSummary,
   getVisualResultsDownloadUrl,
-  fetchPersonas,
 } from '@/lib/api'
 import type {
   Persona,
   ProviderType,
   VisualJob,
   VisualJobSummary,
-  VISION_MODELS,
 } from '@/lib/types'
 import { PROVIDERS, VISION_MODELS as VisionModels } from '@/lib/types'
+import { CustomPersonaModal } from './CustomPersonaModal'
+import { AIPersonaGeneratorModal } from './AIPersonaGeneratorModal'
 
 interface APIKeyState {
   key: string
@@ -28,6 +28,14 @@ interface APIKeyState {
 
 interface VisualAssessmentProps {
   apiKeys: Record<ProviderType, APIKeyState>
+}
+
+// Built-in minimal persona for visual assessment
+const MINIMAL_PERSONA: Persona = {
+  id: 'minimal',
+  name: 'Minimal',
+  description: 'No specific framing - raw model response',
+  prompt_prefix: '',
 }
 
 export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
@@ -44,8 +52,15 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
   const [temperature, setTemperature] = useState(0.7)
   const [runsPerModel, setRunsPerModel] = useState(1)
 
-  // Personas from backend
-  const [personas, setPersonas] = useState<Persona[]>([])
+  // Custom personas state
+  const [customPersonas, setCustomPersonas] = useState<Persona[]>([])
+  const [showCustomPersonaModal, setShowCustomPersonaModal] = useState(false)
+  const [showAIPersonaModal, setShowAIPersonaModal] = useState(false)
+
+  // Combine built-in minimal with custom personas
+  const allPersonas = useMemo(() => {
+    return [MINIMAL_PERSONA, ...customPersonas]
+  }, [customPersonas])
 
   // Job state
   const [currentJob, setCurrentJob] = useState<VisualJob | null>(null)
@@ -57,10 +72,30 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
   type ViewState = 'configure' | 'running' | 'results'
   const [viewState, setViewState] = useState<ViewState>('configure')
 
-  // Load personas on mount
-  useEffect(() => {
-    fetchPersonas().then(setPersonas).catch(console.error)
-  }, [])
+  // Get AI-capable providers for persona generation
+  const aiProviders = useMemo(() => {
+    return (['openai', 'anthropic'] as ProviderType[])
+      .filter((p) => apiKeys[p]?.status === 'valid')
+      .map((p) => ({
+        provider: p,
+        apiKey: apiKeys[p].key,
+        baseUrl: apiKeys[p].baseUrl,
+      }))
+  }, [apiKeys])
+
+  // Handlers for custom personas
+  const handleAddCustomPersona = (persona: Persona) => {
+    setCustomPersonas((prev) => [...prev, persona])
+  }
+
+  const handleAddGeneratedPersonas = (personas: Persona[]) => {
+    setCustomPersonas((prev) => [...prev, ...personas])
+  }
+
+  const handleRemoveCustomPersona = (personaId: string) => {
+    setCustomPersonas((prev) => prev.filter((p) => p.id !== personaId))
+    setSelectedPersonas((prev) => prev.filter((id) => id !== personaId))
+  }
 
   // Get available vision models based on validated API keys
   const availableVisionModels = useCallback(() => {
@@ -186,6 +221,11 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
         base_url: apiKeys[provider].baseUrl,
       }))
 
+      // Get custom personas that are selected
+      const selectedCustomPersonas = customPersonas.filter((p) =>
+        selectedPersonas.includes(p.id)
+      )
+
       const response = await createVisualJob({
         config: {
           models: selectedModels,
@@ -197,6 +237,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
         api_keys: apiKeysList,
         image_data: imageData,
         image_description: imageDescription || undefined,
+        custom_personas: selectedCustomPersonas.length > 0 ? selectedCustomPersonas : undefined,
       })
 
       setCurrentJob(response.job)
@@ -465,50 +506,135 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
         </div>
 
         {/* Persona Selection */}
-        <div className="card p-6">
-          <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            Personas
-            <span className="badge-neutral ml-2">{selectedPersonas.length} selected</span>
-          </h3>
+        <div className="card overflow-hidden">
+          {/* Header */}
+          <div className="px-6 py-4 bg-gradient-to-r from-amber-50 to-white border-b border-amber-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text-primary">Personas</h3>
+                  <p className="text-sm text-text-secondary">
+                    {selectedPersonas.length > 0
+                      ? `${selectedPersonas.length} persona${selectedPersonas.length !== 1 ? 's' : ''} selected`
+                      : 'Select personas to frame the responses'}
+                  </p>
+                </div>
+              </div>
+              {selectedPersonas.length > 0 && (
+                <span className="badge-info">
+                  {selectedPersonas.length} selected
+                </span>
+              )}
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {personas.map((persona) => (
-              <label
-                key={persona.id}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  selectedPersonas.includes(persona.id)
-                    ? 'border-accent bg-accent/5'
-                    : 'border-border-primary hover:border-border-secondary'
-                }`}
+          {/* Content */}
+          <div className="p-6">
+            {/* Add Persona Buttons */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowCustomPersonaModal(true)}
               >
-                <input
-                  type="checkbox"
-                  checked={selectedPersonas.includes(persona.id)}
-                  onChange={() => togglePersona(persona.id)}
-                  className="sr-only"
-                />
-                <div className={`w-4 h-4 rounded border flex items-center justify-center ${
-                  selectedPersonas.includes(persona.id)
-                    ? 'bg-accent border-accent'
-                    : 'border-border-secondary'
-                }`}>
-                  {selectedPersonas.includes(persona.id) && (
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary truncate">{persona.name}</p>
-                  {persona.description && (
-                    <p className="text-xs text-text-tertiary truncate">{persona.description}</p>
-                  )}
-                </div>
-              </label>
-            ))}
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Custom Persona
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowAIPersonaModal(true)}
+                disabled={aiProviders.length === 0}
+                title={aiProviders.length === 0 ? 'Connect an OpenAI or Anthropic API key to use AI persona generation' : undefined}
+              >
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI Generate Personas
+              </Button>
+            </div>
+
+            {/* Persona List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {allPersonas.map((persona) => {
+                const isCustom = persona.id.startsWith('custom_') || persona.id.startsWith('ai_')
+                const isSelected = selectedPersonas.includes(persona.id)
+
+                return (
+                  <div
+                    key={persona.id}
+                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      isSelected
+                        ? 'border-accent bg-accent/5'
+                        : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:bg-white'
+                    }`}
+                    onClick={() => togglePersona(persona.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                        isSelected
+                          ? 'bg-accent text-white'
+                          : 'bg-white border-2 border-gray-200'
+                      }`}>
+                        {isSelected && (
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-text-primary truncate">
+                            {persona.name}
+                          </p>
+                          {isCustom && (
+                            <span className="text-xs px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
+                              Custom
+                            </span>
+                          )}
+                        </div>
+                        {persona.description && (
+                          <p className="text-xs text-text-secondary mt-0.5 line-clamp-1">
+                            {persona.description}
+                          </p>
+                        )}
+                        {persona.prompt_prefix && (
+                          <p className="text-xs text-text-tertiary mt-1 line-clamp-2 italic">
+                            &ldquo;{persona.prompt_prefix}&rdquo;
+                          </p>
+                        )}
+                      </div>
+                      {isCustom && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveCustomPersona(persona.id)
+                          }}
+                          className="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
+                          title="Remove persona"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Tip */}
+            <p className="text-xs text-text-tertiary mt-4">
+              Tip: The Minimal persona sends the prompt without any framing. Add custom personas to test different perspectives.
+            </p>
           </div>
         </div>
 
@@ -587,6 +713,22 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
           </Button>
         </div>
         </div>
+
+        {/* Custom Persona Modal */}
+        <CustomPersonaModal
+          isOpen={showCustomPersonaModal}
+          onClose={() => setShowCustomPersonaModal(false)}
+          onAdd={handleAddCustomPersona}
+          existingIds={allPersonas.map((p) => p.id)}
+        />
+
+        {/* AI Persona Generator Modal */}
+        <AIPersonaGeneratorModal
+          isOpen={showAIPersonaModal}
+          onClose={() => setShowAIPersonaModal(false)}
+          onAdd={handleAddGeneratedPersonas}
+          availableProviders={aiProviders}
+        />
       </div>
     )
   }
