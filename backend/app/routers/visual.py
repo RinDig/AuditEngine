@@ -60,6 +60,13 @@ async def create_visual_job(
     # Add custom personas
     for custom_persona in request.custom_personas:
         personas_dict[custom_persona.id] = custom_persona
+        logger.info(f"Added custom persona: id={custom_persona.id}, name={custom_persona.name}, "
+                   f"prompt_prefix={custom_persona.prompt_prefix[:100] if custom_persona.prompt_prefix else 'None'}...")
+
+    # Log all personas in the dict for debugging
+    logger.info(f"Visual job personas: {list(personas_dict.keys())}")
+    for pid, p in personas_dict.items():
+        logger.info(f"  - {pid}: prompt_prefix={p.prompt_prefix[:50] if p.prompt_prefix else 'None'}...")
 
     # Run assessment in background
     background_tasks.add_task(

@@ -164,6 +164,11 @@ async def run_visual_assessment(
                 # Get system prompt from persona (may be empty for minimal persona)
                 system_prompt = persona.prompt_prefix if persona.prompt_prefix else None
 
+                # Debug logging to trace persona system prompt
+                logger.info(f"Visual assessment - Model: {model}, Persona: {persona.id}, "
+                           f"Persona name: {persona.name}, "
+                           f"System prompt: {system_prompt[:100] if system_prompt else 'None'}...")
+
                 # Call the vision API with user prompt and system prompt
                 llm_response = await provider.complete_with_vision(
                     prompt=job.config.prompt,
