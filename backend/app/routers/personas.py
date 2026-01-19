@@ -2,15 +2,17 @@
 Persona-related API endpoints.
 """
 
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 from app.models.schemas import Persona, PersonaListResponse
 from app.data.loader import load_builtin_personas
 from app.services.persona_generator import generate_personas
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/personas", tags=["personas"])
 
 
@@ -20,7 +22,7 @@ class GeneratePersonasRequest(BaseModel):
     count: int = Field(default=3, ge=1, le=5, description="Number of personas to generate")
     provider: str = Field(default="openai", description="AI provider to use (openai or anthropic)")
     model: Optional[str] = Field(default=None, description="Model to use (optional)")
-    api_key: str = Field(..., min_length=1, description="API key for the provider")
+    api_key: SecretStr = Field(..., min_length=10, description="API key for the provider")
     base_url: Optional[str] = Field(default=None, description="Optional base URL for the provider")
 
 
@@ -72,7 +74,7 @@ async def generate_personas_endpoint(request: GeneratePersonasRequest):
         personas = await generate_personas(
             description=request.description,
             count=request.count,
-            api_key=request.api_key,
+            api_key=request.api_key.get_secret_value(),
             provider=request.provider,
             model=request.model,
             base_url=request.base_url,
@@ -85,4 +87,6 @@ async def generate_personas_endpoint(request: GeneratePersonasRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate personas: {str(e)}")
+        # Log full error for debugging, return generic message to client
+        logger.exception("Failed to generate personas")
+        raise HTTPException(status_code=500, detail="Failed to generate personas due to an unexpected error")

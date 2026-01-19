@@ -56,6 +56,64 @@ Key data flow:
 4. Scores reverse-coded per scale definition
 5. Results stored in Supabase, progress streamed via WebSocket
 
+## API Key Security & Flow
+
+**Important**: User API keys are NEVER stored on the server. They flow through the system in-memory only.
+
+### Production Flow (Vercel → Railway)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 1. BROWSER (Vercel)                                                         │
+│    User enters API keys → Stored in React state (browser memory only)       │
+│    Keys validated via POST /api/keys/validate                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼ HTTPS POST /api/jobs
+                                      │ (keys in request body)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 2. BACKEND (Railway)                                                        │
+│    jobs.py: create_job() receives keys in CreateJobRequest                  │
+│    Keys passed to background task run_job_async()                           │
+│    orchestrator.py: Keys used to create provider instances (in-memory)      │
+│    LLM calls made → Keys discarded when job completes                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Storage Summary
+
+| Location | Storage Type | Duration |
+|----------|--------------|----------|
+| Browser (Vercel) | React state | Until page refresh/close |
+| Network | HTTPS request body | Transit only |
+| Railway backend | In-memory (function params) | Duration of job only |
+| Database | **Never stored** | N/A |
+
+### Key Files in the Flow
+
+1. **Frontend input**: `frontend/src/components/wizard/APIKeysSection.tsx`
+   - User enters keys, stored in React state
+   - Validation calls `validateAPIKey()` from `api.ts`
+
+2. **Frontend submission**: `frontend/src/app/page.tsx` (handleStartAssessment)
+   - Builds `apiKeyConfigs` array from validated keys
+   - Calls `createJob()` with keys in request body
+
+3. **Backend validation**: `backend/app/routers/keys.py`
+   - POST `/api/keys/validate` - tests key validity with provider
+
+4. **Backend job creation**: `backend/app/routers/jobs.py`
+   - POST `/api/jobs` - receives keys in `CreateJobRequest.api_keys`
+   - `run_job_async()` creates providers with keys, runs assessment
+
+5. **Job processing**: `backend/app/services/orchestrator.py`
+   - `Orchestrator.run_assessment()` - core job processor
+   - Providers hold keys in memory during execution only
+
+### CLI Script (Development Only)
+
+`backend/run_assessment.py` is a standalone CLI tool that reads API keys from environment variables (`.env` file). This is **only for local testing** and is not used in the production web flow.
+
 ## Critical Implementation Details
 
 ### Provider-Specific Rate Limiting (MUST preserve)

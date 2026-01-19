@@ -13,6 +13,10 @@ import type {
   CreateJobRequest,
   ScaleListResponse,
   PersonaListResponse,
+  VisualJob,
+  VisualJobResponse,
+  VisualJobSummary,
+  CreateVisualJobRequest,
 } from './types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
@@ -199,6 +203,39 @@ export async function downloadResults(
 
 export async function checkHealth(): Promise<{ status: string }> {
   return request<{ status: string }>('/health')
+}
+
+// =============================================================================
+// Visual Assessment API
+// =============================================================================
+
+export async function createVisualJob(jobRequest: CreateVisualJobRequest): Promise<VisualJobResponse> {
+  return request<VisualJobResponse>('/api/visual/jobs', {
+    method: 'POST',
+    body: JSON.stringify(jobRequest),
+  })
+}
+
+export async function fetchVisualJob(id: string): Promise<VisualJobResponse> {
+  return request<VisualJobResponse>(`/api/visual/jobs/${id}`)
+}
+
+export async function fetchVisualJobSummary(id: string): Promise<VisualJobSummary> {
+  return request<VisualJobSummary>(`/api/visual/jobs/${id}/summary`)
+}
+
+export async function cancelVisualJob(id: string): Promise<{ message: string; job_id: string }> {
+  return request(`/api/visual/jobs/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+export function getVisualResultsDownloadUrl(jobId: string, format: 'csv' | 'json'): string {
+  return `${API_URL}/api/visual/jobs/${jobId}/download?format=${format}`
+}
+
+export async function fetchVisionModels(): Promise<Record<string, string[]>> {
+  return request<Record<string, string[]>>('/api/visual/models')
 }
 
 // =============================================================================

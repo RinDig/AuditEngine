@@ -178,6 +178,104 @@ export interface ProviderInfo {
   default_base_url?: string
 }
 
+// =============================================================================
+// Visual Assessment Types
+// =============================================================================
+
+export type VisualJobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+
+export interface VisualJobConfig {
+  models: string[]
+  personas: string[]
+  prompt: string
+  runs_per_model: number
+  temperature: number
+}
+
+export interface VisualJobProgress {
+  total_calls: number
+  completed_calls: number
+  failed_calls: number
+  current_phase: string
+  percent_complete: number
+}
+
+export interface VisualJob {
+  id: string
+  status: VisualJobStatus
+  created_at: string
+  updated_at: string
+  config: VisualJobConfig
+  progress: VisualJobProgress
+  image_description?: string
+  error?: string
+}
+
+export interface VisualResponseRecord {
+  job_id: string
+  model_name: string
+  persona_id: string
+  run_number: number
+  temperature: number
+  prompt: string
+  response_text: string
+  tokens_used: number
+  duration_ms: number
+  timestamp: string
+  error?: string
+}
+
+export interface CreateVisualJobRequest {
+  config: VisualJobConfig
+  api_keys: APIKeyConfig[]
+  image_data: string
+  image_description?: string
+  custom_personas?: Persona[]
+}
+
+export interface VisualJobResponse {
+  job: VisualJob
+  message?: string
+}
+
+export interface VisualJobSummary {
+  job_id: string
+  total_responses: number
+  failed_responses: number
+  total_tokens: number
+  responses: VisualResponseRecord[]
+}
+
+// Vision-capable models by provider
+export const VISION_MODELS: Record<ProviderType, string[]> = {
+  openai: [
+    'gpt-5.2', 'gpt-5.2-chat-latest', 'gpt-5.2-pro',
+    'gpt-5.1', 'gpt-5.1-chat-latest',
+    'gpt-5', 'gpt-5-mini',
+    'gpt-4o', 'gpt-4o-mini',
+    'gpt-4.1', 'gpt-4.1-mini',
+    'gpt-4-turbo',
+    'o1', 'o1-preview',
+  ],
+  anthropic: [
+    'claude-opus-4-5-20251124', 'claude-sonnet-4-5-20251022', 'claude-haiku-4-5-20251015',
+    'claude-sonnet-4-20250514', 'claude-opus-4-20250514',
+    'claude-3-5-sonnet-latest', 'claude-3-5-sonnet-20241022',
+    'claude-3-5-haiku-latest', 'claude-3-5-haiku-20241022',
+    'claude-3-opus-latest', 'claude-3-opus-20240229',
+    'claude-3-sonnet-20240229', 'claude-3-haiku-20240307',
+  ],
+  gemini: [
+    'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro',
+    'gemini-2.0-flash', 'gemini-2.0-flash-lite',
+    'gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro',
+  ],
+  xai: [],
+  llama: [],
+  deepseek: [],
+  groq: ['llama-3.2-90b-vision-preview', 'llama-3.2-11b-vision-preview'],
+}
+
 export const PROVIDERS: ProviderInfo[] = [
   {
     id: 'openai',

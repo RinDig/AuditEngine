@@ -205,8 +205,9 @@ export function APIKeysSection({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
           <p className="text-xs text-text-tertiary">
-            API keys are stored only in your browser session and are sent directly
-            to each provider. They are never stored on our servers.
+            API keys are stored in your browser session only. When you run an assessment,
+            keys are sent securely (HTTPS) to our backend, used in-memory to make API calls,
+            then discarded when the job completes. Keys are never persisted to disk or database.
           </p>
         </div>
       </div>

@@ -39,6 +39,20 @@ class BaseLLMProvider(ABC):
         """Return list of available model identifiers."""
         pass
 
+    @property
+    def vision_models(self) -> list[str]:
+        """
+        Return list of models that support vision/image input.
+        Override in subclasses that support vision.
+        Default: empty list (no vision support).
+        """
+        return []
+
+    @property
+    def supports_vision(self) -> bool:
+        """Return True if this provider has any vision-capable models."""
+        return len(self.vision_models) > 0
+
     @abstractmethod
     async def complete(
         self,
@@ -60,6 +74,33 @@ class BaseLLMProvider(ABC):
             LLMResponse with the model's response
         """
         pass
+
+    async def complete_with_vision(
+        self,
+        prompt: str,
+        image_data: str,
+        model: str,
+        temperature: float = 0.0,
+        max_tokens: int = 1000
+    ) -> LLMResponse:
+        """
+        Send a completion request with an image to the LLM.
+
+        Args:
+            prompt: The prompt text
+            image_data: Base64-encoded image data (with or without data URI prefix)
+            model: Model identifier (must be in vision_models)
+            temperature: Sampling temperature
+            max_tokens: Maximum tokens in response
+
+        Returns:
+            LLMResponse with the model's response
+
+        Raises:
+            NotImplementedError: If provider doesn't support vision
+            ValueError: If model doesn't support vision
+        """
+        raise NotImplementedError(f"{self.provider_name} does not support vision")
 
     @abstractmethod
     async def validate_key(self) -> tuple[bool, Optional[str]]:

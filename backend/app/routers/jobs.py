@@ -133,7 +133,7 @@ async def run_job_async(
             try:
                 provider = create_provider(
                     provider_type=key_config.provider.value,
-                    api_key=key_config.api_key,
+                    api_key=key_config.api_key.get_secret_value(),
                     base_url=key_config.base_url
                 )
                 orchestrator.register_provider(key_config.provider.value, provider)

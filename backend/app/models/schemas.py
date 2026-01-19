@@ -9,7 +9,7 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field, SecretStr, computed_field
 
 
 # =============================================================================
@@ -182,9 +182,14 @@ class ProviderType(str, Enum):
 
 
 class APIKeyConfig(BaseModel):
-    """API key configuration for a provider."""
+    """
+    API key configuration for a provider.
+
+    Uses SecretStr to prevent accidental logging/exposure of API keys.
+    Access the actual key value with: config.api_key.get_secret_value()
+    """
     provider: ProviderType
-    api_key: str
+    api_key: SecretStr = Field(..., min_length=10, description="API key (minimum 10 characters)")
     base_url: Optional[str] = None  # For custom endpoints (Llama)
     is_valid: Optional[bool] = None
 
@@ -225,3 +230,93 @@ class PersonaListResponse(BaseModel):
     """Response body for listing personas."""
     personas: list[Persona]
     total: int
+
+
+# =============================================================================
+# Visual Assessment Models
+# =============================================================================
+
+class VisualJobStatus(str, Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class VisualJobConfig(BaseModel):
+    """Configuration for a visual assessment job."""
+    models: list[str]  # Model identifiers (must support vision)
+    personas: list[str]  # Persona IDs
+    prompt: str = Field(
+        default="What do you see in this image?",
+        description="The prompt/question to ask about the image"
+    )
+    runs_per_model: int = Field(default=1, ge=1, le=10)
+    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
+
+
+class VisualJobProgress(BaseModel):
+    """Real-time progress tracking for a visual assessment job."""
+    total_calls: int = 0
+    completed_calls: int = 0
+    failed_calls: int = 0
+    current_phase: Optional[str] = None
+
+    @computed_field
+    @property
+    def percent_complete(self) -> float:
+        if self.total_calls == 0:
+            return 0.0
+        return (self.completed_calls / self.total_calls) * 100
+
+
+class VisualJob(BaseModel):
+    """A visual assessment job."""
+    id: UUID = Field(default_factory=uuid4)
+    status: VisualJobStatus = VisualJobStatus.PENDING
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    config: VisualJobConfig
+    progress: VisualJobProgress = Field(default_factory=VisualJobProgress)
+    image_description: Optional[str] = None  # User-provided context about the image
+    error: Optional[str] = None
+
+
+class VisualResponseRecord(BaseModel):
+    """A single visual assessment response record."""
+    job_id: UUID
+    model_name: str
+    persona_id: str
+    run_number: int
+    temperature: float
+    prompt: str
+    response_text: str  # The model's description/response
+    tokens_used: int
+    duration_ms: int
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    error: Optional[str] = None  # If this specific call failed
+
+
+class CreateVisualJobRequest(BaseModel):
+    """Request body for creating a visual assessment job."""
+    config: VisualJobConfig
+    api_keys: list[APIKeyConfig]
+    image_data: str = Field(..., description="Base64-encoded image data (with or without data URI prefix)")
+    image_description: Optional[str] = Field(None, max_length=500, description="Optional description/context for the image")
+    custom_personas: list["Persona"] = []
+
+
+class VisualJobResponse(BaseModel):
+    """Response body for visual job operations."""
+    job: VisualJob
+    message: Optional[str] = None
+
+
+class VisualJobSummary(BaseModel):
+    """Summary of a completed visual assessment job."""
+    job_id: UUID
+    total_responses: int
+    failed_responses: int
+    total_tokens: int
+    responses: list[VisualResponseRecord]

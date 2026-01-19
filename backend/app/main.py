@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import jobs, scales, personas, keys
+from app.routers import jobs, scales, personas, keys, visual
 
 # Configure logging
 logging.basicConfig(
@@ -68,6 +68,7 @@ app.include_router(jobs.router, prefix="/api")
 app.include_router(scales.router, prefix="/api")
 app.include_router(personas.router, prefix="/api")
 app.include_router(keys.router, prefix="/api")
+app.include_router(visual.router, prefix="/api")
 
 
 @app.get("/")

@@ -13,6 +13,7 @@ import {
   CustomPersonaModal,
   AIPersonaGeneratorModal,
   CustomScaleModal,
+  VisualAssessment,
 } from '@/components/wizard'
 import {
   fetchScales,
@@ -32,6 +33,8 @@ import type {
   APIKeyStatus,
 } from '@/lib/types'
 import { PROVIDERS } from '@/lib/types'
+
+type AssessmentMode = 'text' | 'visual'
 
 // Initialize API key state for all providers
 function initializeAPIKeys(): Record<
@@ -69,6 +72,7 @@ export default function Home() {
   // App state
   const [appState, setAppState] = useState<AppState>('configure')
   const [backendConnected, setBackendConnected] = useState<boolean | null>(null)
+  const [assessmentMode, setAssessmentMode] = useState<AssessmentMode>('text')
 
   // Data from backend
   const [scales, setScales] = useState<Scale[]>([])
@@ -450,177 +454,226 @@ export default function Home() {
             Compare responses, analyze patterns, and export comprehensive results.
           </p>
 
-          {/* Quick Stats */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm">
-            <div className="flex items-center gap-2 text-teal-100">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Assessment Mode Tabs */}
+          <div className="inline-flex items-center p-1 bg-white/10 backdrop-blur rounded-xl mb-8">
+            <button
+              onClick={() => setAssessmentMode('text')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                assessmentMode === 'text'
+                  ? 'bg-white text-teal-700 shadow-lg'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <span><strong className="text-white">{scales.length}</strong> Scales Available</span>
-            </div>
-            <div className="flex items-center gap-2 text-teal-100">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span><strong className="text-white">7</strong> Providers Supported</span>
-            </div>
-            <div className="flex items-center gap-2 text-teal-100">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span><strong className="text-white">{allPersonas.length}</strong> Personas</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Configuration Section */}
-      <div className="section-light">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="space-y-6">
-            {/* Section Header */}
-            <div className="flex items-center gap-3 mb-2">
-              <div className="section-number">1</div>
-              <div>
-                <p className="section-header">Step 1</p>
-                <h2 className="text-lg font-semibold text-text-primary">Configure API Access</h2>
-              </div>
-            </div>
-
-            <APIKeysSection
-              apiKeys={apiKeys}
-              onKeyChange={handleKeyChange}
-              onValidate={handleKeyValidated}
-            />
-
-            <div className="flex items-center gap-3 mb-2 pt-4">
-              <div className="section-number">2</div>
-              <div>
-                <p className="section-header">Step 2</p>
-                <h2 className="text-lg font-semibold text-text-primary">Select Assessment Scales</h2>
-              </div>
-            </div>
-
-            <ScalesSection
-              scales={allScales}
-              selectedScales={selectedScales}
-              onSelectionChange={setSelectedScales}
-              onAddCustom={() => setShowCustomScaleModal(true)}
-              onRemoveCustom={handleRemoveCustomScale}
-            />
-
-            <div className="flex items-center gap-3 mb-2 pt-4">
-              <div className="section-number">3</div>
-              <div>
-                <p className="section-header">Step 3</p>
-                <h2 className="text-lg font-semibold text-text-primary">Choose Models to Test</h2>
-              </div>
-            </div>
-
-            <ModelsSection
-              apiKeys={apiKeys}
-              selectedModels={selectedModels}
-              onSelectionChange={setSelectedModels}
-            />
-
-            <div className="flex items-center gap-3 mb-2 pt-4">
-              <div className="section-number">4</div>
-              <div>
-                <p className="section-header">Step 4</p>
-                <h2 className="text-lg font-semibold text-text-primary">Select Personas</h2>
-              </div>
-            </div>
-
-            <PersonasSection
-              personas={allPersonas}
-              selectedPersonas={selectedPersonas}
-              onSelectionChange={setSelectedPersonas}
-              onAddCustom={() => setShowCustomPersonaModal(true)}
-              onRemoveCustom={handleRemoveCustomPersona}
-              onAIGenerate={() => setShowAIPersonaModal(true)}
-              hasAIProviders={aiProviders.length > 0}
-            />
-
-            <div className="flex items-center gap-3 mb-2 pt-4">
-              <div className="section-number">5</div>
-              <div>
-                <p className="section-header">Step 5</p>
-                <h2 className="text-lg font-semibold text-text-primary">Run Configuration</h2>
-              </div>
-            </div>
-
-            <ConfigSection
-              temperature={temperature}
-              runsPerItem={runsPerItem}
-              totalItems={totalItems}
-              totalModels={selectedModels.length}
-              totalPersonas={selectedPersonas.length}
-              onTemperatureChange={setTemperature}
-              onRunsPerItemChange={setRunsPerItem}
-            />
-
-            {/* Error Display */}
-            {error && (
-              <div className="flex items-center gap-3 p-4 bg-status-error/10 border border-status-error/20 rounded-xl">
-                <svg className="w-5 h-5 text-status-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-sm text-status-error">{error}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Sticky Submit Footer */}
-      <div className="sticky bottom-0 bg-white/80 backdrop-blur-xl border-t border-gray-200 shadow-lg shadow-black/5">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              {canSubmit ? (
-                <>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="text-sm font-medium text-emerald-700">Ready to run</span>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-4 text-sm text-text-secondary">
-                    <span>{selectedScales.length} scale{selectedScales.length !== 1 ? 's' : ''}</span>
-                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                    <span>{selectedModels.length} model{selectedModels.length !== 1 ? 's' : ''}</span>
-                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                    <span>{selectedPersonas.length} persona{selectedPersonas.length !== 1 ? 's' : ''}</span>
-                  </div>
-                </>
-              ) : (
-                <p className="text-sm text-text-secondary">
-                  {Object.values(apiKeys).every((k) => k.status !== 'valid')
-                    ? 'Connect at least one API provider to continue'
-                    : selectedScales.length === 0
-                      ? 'Select at least one scale to continue'
-                      : selectedModels.length === 0
-                        ? 'Select at least one model to continue'
-                        : selectedPersonas.length === 0
-                          ? 'Select at least one persona to continue'
-                          : ''}
-                </p>
-              )}
-            </div>
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={!canSubmit || submitting}
-              loading={submitting}
-              onClick={handleStartAssessment}
+              Text Assessment
+            </button>
+            <button
+              onClick={() => setAssessmentMode('visual')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                assessmentMode === 'visual'
+                  ? 'bg-white text-teal-700 shadow-lg'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
             >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Start Assessment
-            </Button>
+              Visual Assessment
+            </button>
           </div>
+
+          {/* Quick Stats - only show for text mode */}
+          {assessmentMode === 'text' && (
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-teal-100">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span><strong className="text-white">{scales.length}</strong> Scales Available</span>
+              </div>
+              <div className="flex items-center gap-2 text-teal-100">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span><strong className="text-white">7</strong> Providers Supported</span>
+              </div>
+              <div className="flex items-center gap-2 text-teal-100">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span><strong className="text-white">{allPersonas.length}</strong> Personas</span>
+              </div>
+            </div>
+          )}
+
+          {/* Visual mode description */}
+          {assessmentMode === 'visual' && (
+            <p className="text-teal-100 text-sm max-w-lg mx-auto">
+              Upload an image and get open-ended responses from vision-capable models across different personas.
+              Perfect for Rorschach tests and visual stimulus analysis.
+            </p>
+          )}
         </div>
       </div>
+
+      {/* Text Assessment Configuration */}
+      {assessmentMode === 'text' && (
+        <>
+          <div className="section-light">
+            <div className="max-w-6xl mx-auto px-6 py-8">
+              <div className="space-y-6">
+                {/* Section Header */}
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="section-number">1</div>
+                  <div>
+                    <p className="section-header">Step 1</p>
+                    <h2 className="text-lg font-semibold text-text-primary">Configure API Access</h2>
+                  </div>
+                </div>
+
+                <APIKeysSection
+                  apiKeys={apiKeys}
+                  onKeyChange={handleKeyChange}
+                  onValidate={handleKeyValidated}
+                />
+
+                <div className="flex items-center gap-3 mb-2 pt-4">
+                  <div className="section-number">2</div>
+                  <div>
+                    <p className="section-header">Step 2</p>
+                    <h2 className="text-lg font-semibold text-text-primary">Select Assessment Scales</h2>
+                  </div>
+                </div>
+
+                <ScalesSection
+                  scales={allScales}
+                  selectedScales={selectedScales}
+                  onSelectionChange={setSelectedScales}
+                  onAddCustom={() => setShowCustomScaleModal(true)}
+                  onRemoveCustom={handleRemoveCustomScale}
+                />
+
+                <div className="flex items-center gap-3 mb-2 pt-4">
+                  <div className="section-number">3</div>
+                  <div>
+                    <p className="section-header">Step 3</p>
+                    <h2 className="text-lg font-semibold text-text-primary">Choose Models to Test</h2>
+                  </div>
+                </div>
+
+                <ModelsSection
+                  apiKeys={apiKeys}
+                  selectedModels={selectedModels}
+                  onSelectionChange={setSelectedModels}
+                />
+
+                <div className="flex items-center gap-3 mb-2 pt-4">
+                  <div className="section-number">4</div>
+                  <div>
+                    <p className="section-header">Step 4</p>
+                    <h2 className="text-lg font-semibold text-text-primary">Select Personas</h2>
+                  </div>
+                </div>
+
+                <PersonasSection
+                  personas={allPersonas}
+                  selectedPersonas={selectedPersonas}
+                  onSelectionChange={setSelectedPersonas}
+                  onAddCustom={() => setShowCustomPersonaModal(true)}
+                  onRemoveCustom={handleRemoveCustomPersona}
+                  onAIGenerate={() => setShowAIPersonaModal(true)}
+                  hasAIProviders={aiProviders.length > 0}
+                />
+
+                <div className="flex items-center gap-3 mb-2 pt-4">
+                  <div className="section-number">5</div>
+                  <div>
+                    <p className="section-header">Step 5</p>
+                    <h2 className="text-lg font-semibold text-text-primary">Run Configuration</h2>
+                  </div>
+                </div>
+
+                <ConfigSection
+                  temperature={temperature}
+                  runsPerItem={runsPerItem}
+                  totalItems={totalItems}
+                  totalModels={selectedModels.length}
+                  totalPersonas={selectedPersonas.length}
+                  onTemperatureChange={setTemperature}
+                  onRunsPerItemChange={setRunsPerItem}
+                />
+
+                {/* Error Display */}
+                {error && (
+                  <div className="flex items-center gap-3 p-4 bg-status-error/10 border border-status-error/20 rounded-xl">
+                    <svg className="w-5 h-5 text-status-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm text-status-error">{error}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Sticky Submit Footer */}
+          <div className="sticky bottom-0 bg-white/80 backdrop-blur-xl border-t border-gray-200 shadow-lg shadow-black/5">
+            <div className="max-w-6xl mx-auto px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  {canSubmit ? (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="text-sm font-medium text-emerald-700">Ready to run</span>
+                      </div>
+                      <div className="hidden sm:flex items-center gap-4 text-sm text-text-secondary">
+                        <span>{selectedScales.length} scale{selectedScales.length !== 1 ? 's' : ''}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                        <span>{selectedModels.length} model{selectedModels.length !== 1 ? 's' : ''}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                        <span>{selectedPersonas.length} persona{selectedPersonas.length !== 1 ? 's' : ''}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-sm text-text-secondary">
+                      {Object.values(apiKeys).every((k) => k.status !== 'valid')
+                        ? 'Connect at least one API provider to continue'
+                        : selectedScales.length === 0
+                          ? 'Select at least one scale to continue'
+                          : selectedModels.length === 0
+                            ? 'Select at least one model to continue'
+                            : selectedPersonas.length === 0
+                              ? 'Select at least one persona to continue'
+                              : ''}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  disabled={!canSubmit || submitting}
+                  loading={submitting}
+                  onClick={handleStartAssessment}
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Start Assessment
+                </Button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Visual Assessment */}
+      {assessmentMode === 'visual' && (
+        <VisualAssessment apiKeys={apiKeys} />
+      )}
 
       {/* Custom Persona Modal */}
       <CustomPersonaModal

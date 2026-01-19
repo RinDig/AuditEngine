@@ -49,6 +49,26 @@ class OpenAIProvider(BaseLLMProvider):
         "gpt-3.5-turbo",
     ]
 
+    # Models that support vision/image input
+    VISION_MODELS = [
+        "gpt-5.2",
+        "gpt-5.2-chat-latest",
+        "gpt-5.2-pro",
+        "gpt-5.1",
+        "gpt-5.1-chat-latest",
+        "gpt-5",
+        "gpt-5-mini",
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4o-2024-11-20",
+        "gpt-4o-2024-08-06",
+        "gpt-4.1",
+        "gpt-4.1-mini",
+        "gpt-4-turbo",
+        "o1",
+        "o1-preview",
+    ]
+
     def __init__(self, api_key: str, base_url: Optional[str] = None):
         super().__init__(api_key, base_url)
         self.client = AsyncOpenAI(
@@ -63,6 +83,10 @@ class OpenAIProvider(BaseLLMProvider):
     @property
     def available_models(self) -> list[str]:
         return self.AVAILABLE_MODELS
+
+    @property
+    def vision_models(self) -> list[str]:
+        return self.VISION_MODELS
 
     async def complete(
         self,
@@ -87,6 +111,69 @@ class OpenAIProvider(BaseLLMProvider):
             response = await self.client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+
+        duration_ms = int((time.perf_counter() - start_time) * 1000)
+
+        return LLMResponse(
+            text=response.choices[0].message.content or "",
+            model=response.model,
+            tokens_used=response.usage.total_tokens if response.usage else 0,
+            duration_ms=duration_ms,
+            raw_response=response.model_dump()
+        )
+
+    async def complete_with_vision(
+        self,
+        prompt: str,
+        image_data: str,
+        model: str,
+        temperature: float = 0.0,
+        max_tokens: int = 1000
+    ) -> LLMResponse:
+        """Send completion request with image to OpenAI."""
+        if model not in self.VISION_MODELS:
+            raise ValueError(f"Model {model} does not support vision")
+
+        start_time = time.perf_counter()
+
+        # Ensure image_data has proper data URI format
+        if not image_data.startswith("data:"):
+            # Assume JPEG if no prefix
+            image_data = f"data:image/jpeg;base64,{image_data}"
+
+        # Build message with image
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": image_data}
+                    },
+                    {
+                        "type": "text",
+                        "text": prompt
+                    }
+                ]
+            }
+        ]
+
+        # o1 models don't support temperature
+        is_reasoning_model = model.startswith("o1") or model.startswith("o3")
+
+        if is_reasoning_model:
+            response = await self.client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_completion_tokens=max_tokens,
+            )
+        else:
+            response = await self.client.chat.completions.create(
+                model=model,
+                messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
