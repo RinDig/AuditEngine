@@ -54,9 +54,8 @@ async def create_visual_job(
     _visual_responses[job.id] = []
     _visual_images[job.id] = request.image_data
 
-    # Load personas
-    builtin_personas = load_builtin_personas()
-    personas_dict = {p.id: p for p in builtin_personas}
+    # Load personas (load_builtin_personas already returns dict[str, Persona])
+    personas_dict = load_builtin_personas()
 
     # Add custom personas
     for custom_persona in request.custom_personas:
