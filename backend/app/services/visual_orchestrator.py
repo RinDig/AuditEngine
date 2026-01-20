@@ -164,14 +164,30 @@ async def run_visual_assessment(
                 # Get system prompt from persona (may be empty for minimal persona)
                 system_prompt = persona.prompt_prefix if persona.prompt_prefix else None
 
+                # Build the user prompt - include persona context for stronger role adoption
+                # For vision tasks, reinforcing the persona in the user prompt helps models
+                # stay in character when analyzing images
+                if persona.prompt_prefix:
+                    # Include persona framing in the user prompt for stronger effect
+                    user_prompt = (
+                        f"{persona.prompt_prefix}\n\n"
+                        f"Respond to the following as this persona. "
+                        f"Your response should reflect your unique perspective, experiences, and worldview.\n\n"
+                        f"{job.config.prompt}"
+                    )
+                else:
+                    # Minimal persona - just use the raw prompt
+                    user_prompt = job.config.prompt
+
                 # Debug logging to trace persona system prompt
                 logger.info(f"Visual assessment - Model: {model}, Persona: {persona.id}, "
                            f"Persona name: {persona.name}, "
                            f"System prompt: {system_prompt[:100] if system_prompt else 'None'}...")
+                logger.info(f"User prompt preview: {user_prompt[:200]}...")
 
                 # Call the vision API with user prompt and system prompt
                 llm_response = await provider.complete_with_vision(
-                    prompt=job.config.prompt,
+                    prompt=user_prompt,
                     image_data=image_data,
                     model=model,
                     temperature=job.config.temperature,
@@ -180,13 +196,15 @@ async def run_visual_assessment(
                 )
 
                 # Create response record
+                # Store the original config prompt (not the full user_prompt with persona)
+                # since the persona context is already captured by persona_id
                 response = VisualResponseRecord(
                     job_id=job.id,
                     model_name=model,
                     persona_id=persona.id,
                     run_number=run_number,
                     temperature=job.config.temperature,
-                    prompt=job.config.prompt,
+                    prompt=job.config.prompt,  # Original prompt for display
                     response_text=llm_response.text,
                     tokens_used=llm_response.tokens_used,
                     duration_ms=llm_response.duration_ms,
@@ -203,7 +221,7 @@ async def run_visual_assessment(
                     persona_id=persona.id,
                     run_number=run_number,
                     temperature=job.config.temperature,
-                    prompt=job.config.prompt,
+                    prompt=job.config.prompt,  # Original prompt for display
                     response_text="",
                     tokens_used=0,
                     duration_ms=0,
