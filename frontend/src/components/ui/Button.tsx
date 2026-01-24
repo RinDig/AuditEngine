@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean
   children: ReactNode
@@ -27,6 +27,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 'btn-primary',
       secondary: 'btn-secondary',
       ghost: 'btn-ghost',
+      danger: 'btn-danger',
+      outline: 'btn-outline',
     }
 
     const sizeStyles = {
@@ -51,7 +53,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {loading && (
           <span className="absolute inset-0 flex items-center justify-center">
             <svg
-              className="w-4 h-4 animate-spin text-current"
+              className="w-4 h-4 animate-spin text-current opacity-100"
               fill="none"
               viewBox="0 0 24 24"
             >

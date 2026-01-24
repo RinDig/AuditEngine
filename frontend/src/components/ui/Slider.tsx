@@ -29,7 +29,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
     const currentValue = typeof value === 'number' ? value : Number(value) || 0
 
     return (
-      <div className={cn('space-y-2', className)}>
+      <div className={cn('space-y-3', className)}>
         {(label || showValue) && (
           <div className="flex justify-between items-center">
             {label && (
@@ -41,7 +41,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
               </label>
             )}
             {showValue && (
-              <span className="text-sm font-mono text-text-secondary">
+              <span className="text-lg font-mono font-semibold text-accent">
                 {valueFormatter(currentValue)}
               </span>
             )}
@@ -56,20 +56,22 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
           max={max}
           step={step}
           className={cn(
-            'w-full h-2 bg-surface-muted rounded-full appearance-none cursor-pointer',
+            'w-full h-2 bg-surface-muted rounded appearance-none cursor-pointer',
             '[&::-webkit-slider-thumb]:appearance-none',
             '[&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4',
-            '[&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:rounded-full',
-            '[&::-webkit-slider-thumb]:shadow-sm',
-            '[&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110',
+            '[&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:rounded',
+            '[&::-webkit-slider-thumb]:shadow-glow-sm',
+            '[&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:hover:scale-110',
+            '[&::-webkit-slider-thumb]:hover:shadow-glow-md',
             '[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4',
-            '[&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:rounded-full',
+            '[&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:rounded',
             '[&::-moz-range-thumb]:border-0',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
+            '[&::-moz-range-thumb]:shadow-glow-sm',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface'
           )}
           {...props}
         />
-        <div className="flex justify-between text-xs text-text-tertiary">
+        <div className="flex justify-between text-xs text-text-muted font-mono">
           <span>{min}</span>
           <span>{max}</span>
         </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, Slider } from '@/components/ui'
 import {
   createVisualJob,
   fetchVisualJob,
@@ -17,6 +17,7 @@ import type {
 import { PROVIDERS, VISION_MODELS as VisionModels } from '@/lib/types'
 import { CustomPersonaModal } from './CustomPersonaModal'
 import { AIPersonaGeneratorModal } from './AIPersonaGeneratorModal'
+import { cn } from '@/lib/utils'
 
 interface APIKeyState {
   key: string
@@ -288,35 +289,38 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
     setError(null)
   }
 
-  const visionModels = availableVisionModels()
   const canSubmit = imageData && selectedModels.length > 0 && selectedPersonas.length > 0
 
   // Configuration View
   if (viewState === 'configure') {
     return (
-      <div className="section-light">
-        <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
         {/* Image Upload Section */}
         <div className="card p-6">
-          <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            Image Upload
-          </h3>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-text-primary">Image Upload</h3>
+              <p className="text-sm text-text-muted font-mono">Upload visual stimulus for assessment</p>
+            </div>
+          </div>
 
           {!imagePreview ? (
             <div
-              className="border-2 border-dashed border-border-primary rounded-xl p-8 text-center hover:border-accent transition-colors cursor-pointer"
+              className="border border-dashed border-border rounded p-8 text-center hover:border-accent/50 hover:bg-accent/5 transition-colors cursor-pointer"
               onDrop={handleDrop}
               onDragOver={(e) => e.preventDefault()}
               onClick={() => fileInputRef.current?.click()}
             >
-              <svg className="w-12 h-12 mx-auto text-text-tertiary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-12 h-12 mx-auto text-text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
               <p className="text-text-secondary mb-2">Drag and drop an image, or click to browse</p>
-              <p className="text-xs text-text-tertiary">Supports JPEG, PNG, GIF, WebP (max 10MB)</p>
+              <p className="text-xs text-text-muted font-mono">Supports JPEG, PNG, GIF, WebP (max 10MB)</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -331,7 +335,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                 <img
                   src={imagePreview}
                   alt="Uploaded preview"
-                  className="max-h-64 rounded-lg border border-border-primary"
+                  className="max-h-64 rounded border border-border"
                 />
                 <button
                   onClick={() => {
@@ -347,18 +351,14 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1">
-                  Image Description (optional)
-                </label>
                 <Input
+                  label="Image Description (optional)"
                   value={imageDescription}
                   onChange={(e) => setImageDescription(e.target.value)}
                   placeholder="e.g., Rorschach inkblot test card #1"
-                  className="w-full"
+                  hint="For your records - not sent to the model"
+                  mono
                 />
-                <p className="text-xs text-text-tertiary mt-1">
-                  For your records - not sent to the model
-                </p>
               </div>
             </div>
           )}
@@ -366,65 +366,68 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
 
         {/* Prompt Section */}
         <div className="card p-6">
-          <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-            Prompt
-          </h3>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-text-primary">Prompt</h3>
+              <p className="text-sm text-text-muted font-mono">Define the question for each model</p>
+            </div>
+          </div>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="What do you see in this image?"
             rows={3}
-            className="w-full px-4 py-3 bg-surface-secondary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent resize-none"
+            className="input w-full resize-none font-mono"
           />
-          <p className="text-xs text-text-tertiary mt-2">
+          <p className="text-xs text-text-muted mt-2 font-mono">
             This prompt will be sent with the image to each model. The persona prefix will be prepended.
           </p>
         </div>
 
-        {/* Model Selection - Grouped by Provider */}
-        <div className="card overflow-hidden">
-          {/* Header */}
-          <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+        {/* Model Selection */}
+        <div className="card">
+          <div className="px-6 py-4 border-b border-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                   </svg>
                 </div>
                 <div>
                   <h3 className="font-semibold text-text-primary">Vision-Capable Models</h3>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-text-muted font-mono">
                     {selectedModels.length > 0
                       ? `${selectedModels.length} model${selectedModels.length !== 1 ? 's' : ''} selected`
                       : connectedVisionProviders().length === 0
-                        ? 'Connect API keys above to see available models'
-                        : 'Select models to include in this assessment'}
+                        ? 'Connect API keys to see available models'
+                        : 'Select models to evaluate'}
                   </p>
                 </div>
               </div>
               {selectedModels.length > 0 && (
-                <span className="badge-info">
-                  {selectedModels.length} selected
+                <span className="badge-info font-mono">
+                  {selectedModels.length} SELECTED
                 </span>
               )}
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-6">
             {connectedVisionProviders().length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 rounded bg-surface-muted flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
                 <p className="text-sm text-text-secondary mb-2">No vision-capable providers connected</p>
-                <p className="text-xs text-text-tertiary">
+                <p className="text-xs text-text-muted font-mono">
                   Add API keys for OpenAI, Anthropic, Gemini, or Groq to see vision models.
                 </p>
               </div>
@@ -439,9 +442,9 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
 
                   return (
                     <div key={provider.id} className="space-y-3">
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <div className="flex items-center justify-between py-2 border-b border-border">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded bg-accent/20 flex items-center justify-center">
                             <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
                             </svg>
@@ -450,7 +453,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                             <h4 className="text-sm font-semibold text-text-primary">
                               {provider.name}
                             </h4>
-                            <p className="text-xs text-text-secondary">
+                            <p className="text-xs text-text-muted font-mono">
                               {selectedCount} of {models.length} selected
                             </p>
                           </div>
@@ -458,7 +461,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                         <button
                           type="button"
                           onClick={() => selectAllForProvider(provider.id)}
-                          className="text-xs font-medium text-accent hover:text-accent-hover px-3 py-1.5 rounded-lg hover:bg-accent/5 transition-colors"
+                          className="text-xs font-mono font-medium text-accent hover:text-accent-hover px-3 py-1.5 rounded hover:bg-accent/10 transition-colors uppercase tracking-wide"
                         >
                           {allSelected ? 'Deselect all' : 'Select all'}
                         </button>
@@ -471,18 +474,20 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                             <div
                               key={model}
                               onClick={() => toggleModel(model)}
-                              className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                              className={cn(
+                                'p-3 rounded border cursor-pointer transition-all',
                                 isSelected
-                                  ? 'border-accent bg-accent/5'
-                                  : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:bg-white'
-                              }`}
+                                  ? 'border-accent bg-accent/10'
+                                  : 'border-border bg-surface-muted hover:border-border-focus hover:bg-surface-hover'
+                              )}
                             >
                               <div className="flex items-center gap-2">
-                                <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all ${
+                                <div className={cn(
+                                  'w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all',
                                   isSelected
-                                    ? 'bg-accent text-white'
-                                    : 'bg-white border-2 border-gray-200'
-                                }`}>
+                                    ? 'bg-accent text-surface'
+                                    : 'bg-surface border border-border'
+                                )}>
                                   {isSelected && (
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -506,19 +511,18 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
         </div>
 
         {/* Persona Selection */}
-        <div className="card overflow-hidden">
-          {/* Header */}
-          <div className="px-6 py-4 bg-gradient-to-r from-amber-50 to-white border-b border-amber-100">
+        <div className="card">
+          <div className="px-6 py-4 border-b border-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
                 <div>
                   <h3 className="font-semibold text-text-primary">Personas</h3>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-text-muted font-mono">
                     {selectedPersonas.length > 0
                       ? `${selectedPersonas.length} persona${selectedPersonas.length !== 1 ? 's' : ''} selected`
                       : 'Select personas to frame the responses'}
@@ -526,19 +530,18 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                 </div>
               </div>
               {selectedPersonas.length > 0 && (
-                <span className="badge-info">
-                  {selectedPersonas.length} selected
+                <span className="badge-info font-mono">
+                  {selectedPersonas.length} SELECTED
                 </span>
               )}
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-6">
             {/* Add Persona Buttons */}
             <div className="flex flex-wrap gap-2 mb-4">
               <Button
-                variant="secondary"
+                variant="outline"
                 size="sm"
                 onClick={() => setShowCustomPersonaModal(true)}
               >
@@ -548,7 +551,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                 Add Custom Persona
               </Button>
               <Button
-                variant="secondary"
+                variant="outline"
                 size="sm"
                 onClick={() => setShowAIPersonaModal(true)}
                 disabled={aiProviders.length === 0}
@@ -570,19 +573,21 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                 return (
                   <div
                     key={persona.id}
-                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={cn(
+                      'relative p-4 rounded border cursor-pointer transition-all',
                       isSelected
-                        ? 'border-accent bg-accent/5'
-                        : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:bg-white'
-                    }`}
+                        ? 'border-accent bg-accent/10'
+                        : 'border-border bg-surface-muted hover:border-border-focus hover:bg-surface-hover'
+                    )}
                     onClick={() => togglePersona(persona.id)}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                      <div className={cn(
+                        'w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 transition-all',
                         isSelected
-                          ? 'bg-accent text-white'
-                          : 'bg-white border-2 border-gray-200'
-                      }`}>
+                          ? 'bg-accent text-surface'
+                          : 'bg-surface border border-border'
+                      )}>
                         {isSelected && (
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -595,9 +600,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                             {persona.name}
                           </p>
                           {isCustom && (
-                            <span className="text-xs px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
-                              Custom
-                            </span>
+                            <span className="badge-accent text-xs">CUSTOM</span>
                           )}
                         </div>
                         {persona.description && (
@@ -606,7 +609,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                           </p>
                         )}
                         {persona.prompt_prefix && (
-                          <p className="text-xs text-text-tertiary mt-1 line-clamp-2 italic">
+                          <p className="text-xs text-text-muted mt-1 line-clamp-2 italic font-mono">
                             &ldquo;{persona.prompt_prefix}&rdquo;
                           </p>
                         )}
@@ -617,7 +620,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                             e.stopPropagation()
                             handleRemoveCustomPersona(persona.id)
                           }}
-                          className="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
+                          className="w-6 h-6 rounded-full bg-surface-hover hover:bg-status-error/20 flex items-center justify-center text-text-muted hover:text-status-error transition-colors"
                           title="Remove persona"
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -632,7 +635,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
             </div>
 
             {/* Tip */}
-            <p className="text-xs text-text-tertiary mt-4">
+            <p className="text-xs text-text-muted mt-4 font-mono">
               Tip: The Minimal persona sends the prompt without any framing. Add custom personas to test different perspectives.
             </p>
           </div>
@@ -640,48 +643,41 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
 
         {/* Configuration Options */}
         <div className="card p-6">
-          <h3 className="text-lg font-semibold text-text-primary mb-4">Options</h3>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-text-primary">Options</h3>
+              <p className="text-sm text-text-muted font-mono">Configure assessment parameters</p>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
-                Temperature: {temperature}
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="2"
-                step="0.1"
-                value={temperature}
-                onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                className="w-full"
-              />
-              <p className="text-xs text-text-tertiary mt-1">
-                Higher values = more creative/varied responses
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
-                Runs per Model: {runsPerModel}
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                value={runsPerModel}
-                onChange={(e) => setRunsPerModel(parseInt(e.target.value))}
-                className="w-full"
-              />
-              <p className="text-xs text-text-tertiary mt-1">
-                Run multiple times to see response variation
-              </p>
-            </div>
+            <Slider
+              label="Temperature"
+              value={temperature}
+              min={0}
+              max={2}
+              step={0.1}
+              onChange={(e) => setTemperature(parseFloat(e.target.value))}
+              valueFormatter={(v) => v.toFixed(1)}
+            />
+            <Slider
+              label="Runs per Model"
+              value={runsPerModel}
+              min={1}
+              max={5}
+              step={1}
+              onChange={(e) => setRunsPerModel(parseInt(e.target.value))}
+            />
           </div>
         </div>
 
         {/* Error Display */}
         {error && (
-          <div className="p-4 bg-status-error/10 border border-status-error/20 rounded-lg text-status-error text-sm">
+          <div className="p-4 bg-status-error/10 border border-status-error/20 rounded text-status-error text-sm font-mono">
             {error}
           </div>
         )}
@@ -690,28 +686,17 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
         <div className="flex justify-end">
           <Button
             variant="primary"
+            size="lg"
             disabled={!canSubmit || submitting}
+            loading={submitting}
             onClick={handleSubmit}
           >
-            {submitting ? (
-              <>
-                <svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Starting...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Run Visual Assessment
-              </>
-            )}
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Run Visual Assessment
           </Button>
-        </div>
         </div>
 
         {/* Custom Persona Modal */}
@@ -736,35 +721,33 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
   // Running View
   if (viewState === 'running' && currentJob) {
     return (
-      <div className="section-light">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="card p-6">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center">
-                <svg className="w-8 h-8 text-accent animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-text-primary mb-2">
-                Visual Assessment Running
-              </h3>
-              <p className="text-text-secondary mb-6">
-                {currentJob.progress.current_phase || 'Starting...'}
-              </p>
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="card p-6">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded bg-accent/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-accent animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-text-primary mb-2">
+              Visual Assessment Running
+            </h3>
+            <p className="text-text-secondary mb-6 font-mono">
+              {currentJob.progress.current_phase || 'Starting...'}
+            </p>
 
-              {/* Progress bar */}
-              <div className="max-w-md mx-auto">
-                <div className="flex justify-between text-sm text-text-secondary mb-2">
-                  <span>{currentJob.progress.completed_calls} / {currentJob.progress.total_calls}</span>
-                  <span>{currentJob.progress.percent_complete.toFixed(0)}%</span>
-                </div>
-                <div className="h-3 bg-surface-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent rounded-full transition-all duration-300"
-                    style={{ width: `${currentJob.progress.percent_complete}%` }}
-                  />
-                </div>
+            {/* Progress bar */}
+            <div className="max-w-md mx-auto">
+              <div className="flex justify-between text-sm text-text-muted mb-2 font-mono">
+                <span>{currentJob.progress.completed_calls} / {currentJob.progress.total_calls}</span>
+                <span className="text-accent">{currentJob.progress.percent_complete.toFixed(0)}%</span>
+              </div>
+              <div className="progress-bar">
+                <div
+                  className="progress-bar-fill"
+                  style={{ width: `${currentJob.progress.percent_complete}%` }}
+                />
               </div>
             </div>
           </div>
@@ -776,14 +759,13 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
   // Results View
   if (viewState === 'results' && currentJob) {
     return (
-      <div className="section-light">
-        <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
         {/* Status Banner */}
-        <div className={`card p-6 ${currentJob.status === 'completed' ? 'glow-success' : ''}`}>
+        <div className={`card p-6 ${currentJob.status === 'completed' ? 'border-status-success/30' : ''}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                currentJob.status === 'completed' ? 'bg-status-success/10' : 'bg-status-error/10'
+              <div className={`w-12 h-12 rounded flex items-center justify-center ${
+                currentJob.status === 'completed' ? 'bg-status-success/20' : 'bg-status-error/20'
               }`}>
                 {currentJob.status === 'completed' ? (
                   <svg className="w-6 h-6 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -800,19 +782,19 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                   {currentJob.status === 'completed' ? 'Visual Assessment Complete' : 'Assessment Failed'}
                 </h2>
                 {jobSummary && (
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-text-muted font-mono">
                     {jobSummary.total_responses} responses, {jobSummary.total_tokens} tokens
                   </p>
                 )}
               </div>
             </div>
-            <Button variant="secondary" onClick={handleReset}>
+            <Button variant="outline" onClick={handleReset}>
               New Assessment
             </Button>
           </div>
 
           {currentJob.error && (
-            <div className="mt-4 p-4 bg-status-error/10 border border-status-error/20 rounded-lg text-status-error text-sm">
+            <div className="mt-4 p-4 bg-status-error/10 border border-status-error/20 rounded text-status-error text-sm font-mono">
               {currentJob.error}
             </div>
           )}
@@ -824,19 +806,19 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
             <h3 className="text-lg font-semibold text-text-primary mb-4">Responses</h3>
             <div className="space-y-4">
               {jobSummary.responses.map((response, index) => (
-                <div key={index} className="p-4 bg-surface-muted rounded-lg">
+                <div key={index} className="p-4 bg-surface-muted rounded border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-text-primary">{response.model_name}</span>
-                      <span className="badge-neutral">{response.persona_id}</span>
+                      <span className="text-sm font-medium text-text-primary font-mono">{response.model_name}</span>
+                      <span className="badge-neutral font-mono">{response.persona_id}</span>
                       {response.run_number > 1 && (
-                        <span className="text-xs text-text-tertiary">Run {response.run_number}</span>
+                        <span className="text-xs text-text-muted font-mono">Run {response.run_number}</span>
                       )}
                     </div>
-                    <span className="text-xs text-text-tertiary">{response.tokens_used} tokens</span>
+                    <span className="text-xs text-text-muted font-mono">{response.tokens_used} tokens</span>
                   </div>
                   {response.error ? (
-                    <p className="text-sm text-status-error">{response.error}</p>
+                    <p className="text-sm text-status-error font-mono">{response.error}</p>
                   ) : (
                     <p className="text-sm text-text-secondary whitespace-pre-wrap">{response.response_text}</p>
                   )}
@@ -861,7 +843,7 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
                 Download CSV
               </Button>
               <Button
-                variant="secondary"
+                variant="outline"
                 onClick={() => window.open(getVisualResultsDownloadUrl(currentJob.id, 'json'), '_blank')}
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -872,7 +854,6 @@ export function VisualAssessment({ apiKeys }: VisualAssessmentProps) {
             </div>
           </div>
         )}
-        </div>
       </div>
     )
   }

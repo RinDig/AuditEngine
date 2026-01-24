@@ -28,18 +28,18 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
   const hasStatistics = summary?.statistics && Object.keys(summary.statistics).length > 0
 
   return (
-    <div className="space-y-6 animate-in">
+    <div className="space-y-6">
       {/* Status Banner */}
-      <div className={`card p-6 card-header-gradient ${job.status === 'completed' ? 'glow-success' : ''}`}>
+      <div className={`card p-6 ${job.status === 'completed' ? 'border-status-success/30' : ''}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Status Icon */}
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+            <div className={`w-12 h-12 rounded flex items-center justify-center ${
               job.status === 'completed'
-                ? 'bg-status-success/10'
+                ? 'bg-status-success/20'
                 : job.status === 'failed'
-                  ? 'bg-status-error/10'
-                  : 'bg-status-warning/10'
+                  ? 'bg-status-error/20'
+                  : 'bg-status-warning/20'
             }`}>
               {job.status === 'completed' ? (
                 <svg className="w-6 h-6 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,12 +64,12 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
                     ? 'Assessment Failed'
                     : 'Assessment Cancelled'}
               </h2>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-text-muted font-mono">
                 Finished at {formatTimestamp(job.updated_at)}
               </p>
             </div>
           </div>
-          <Button variant="secondary" onClick={onNewAssessment}>
+          <Button variant="outline" onClick={onNewAssessment}>
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -78,12 +78,12 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
         </div>
 
         {job.error && (
-          <div className="mt-4 p-4 bg-status-error/10 border border-status-error/20 rounded-lg">
+          <div className="mt-4 p-4 bg-status-error/10 border border-status-error/20 rounded">
             <div className="flex items-start gap-3">
               <svg className="w-5 h-5 text-status-error flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-sm text-status-error">{job.error}</p>
+              <p className="text-sm text-status-error font-mono">{job.error}</p>
             </div>
           </div>
         )}
@@ -96,44 +96,44 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
             <h3 className="text-base font-semibold text-text-primary">
               Results Summary
             </h3>
-            <span className="badge-success">
-              {successRate.toFixed(1)}% Success Rate
+            <span className="badge-success font-mono">
+              {successRate.toFixed(1)}% SUCCESS
             </span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="stat-card">
-              <p className="stat-label">Total Responses</p>
-              <p className="stat-value text-accent-gradient">
+            <div className="p-4 bg-surface-muted rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Total Responses</p>
+              <p className="text-2xl font-semibold text-accent font-mono">
                 {formatNumber(summary.total_responses)}
               </p>
             </div>
-            <div className="stat-card">
-              <p className="stat-label">Parse Warnings</p>
-              <p className={`stat-value ${summary.parse_warnings > 0 ? 'text-status-warning' : 'text-text-primary'}`}>
+            <div className="p-4 bg-surface-muted rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Parse Warnings</p>
+              <p className={`text-2xl font-semibold font-mono ${summary.parse_warnings > 0 ? 'text-status-warning' : 'text-text-primary'}`}>
                 {formatNumber(summary.parse_warnings)}
               </p>
               {summary.parse_warnings > 0 && (
-                <p className="text-xs text-status-warning mt-1">
+                <p className="text-xs text-status-warning mt-1 font-mono">
                   {((summary.parse_warnings / summary.total_responses) * 100).toFixed(1)}% of responses
                 </p>
               )}
             </div>
-            <div className="stat-card">
-              <p className="stat-label">Total Tokens</p>
-              <p className="stat-value">
+            <div className="p-4 bg-surface-muted rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Total Tokens</p>
+              <p className="text-2xl font-semibold text-text-primary font-mono">
                 {formatNumber(summary.total_tokens)}
               </p>
             </div>
-            <div className="stat-card">
-              <p className="stat-label">Success Rate</p>
+            <div className="p-4 bg-surface-muted rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Success Rate</p>
               <div className="flex items-end gap-2">
-                <p className="stat-value text-status-success">
+                <p className="text-2xl font-semibold text-status-success font-mono">
                   {successRate.toFixed(1)}%
                 </p>
               </div>
               {/* Mini progress bar */}
-              <div className="mt-2 h-1.5 bg-surface-muted rounded-full overflow-hidden">
+              <div className="mt-2 h-1.5 bg-surface-hover rounded-full overflow-hidden">
                 <div
                   className="h-full bg-status-success rounded-full transition-all duration-500"
                   style={{ width: `${successRate}%` }}
@@ -150,8 +150,8 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
         <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                <svg className="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
@@ -159,14 +159,14 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
                 <h3 className="text-base font-semibold text-text-primary">
                   Visualizations
                 </h3>
-                <p className="text-sm text-text-secondary">
-                  Interactive charts to explore your results
+                <p className="text-sm text-text-muted font-mono">
+                  Interactive charts to explore results
                 </p>
               </div>
             </div>
             <button
               onClick={() => setShowVisualizations(!showVisualizations)}
-              className="text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1"
+              className="text-sm text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 font-mono uppercase tracking-wide"
             >
               {showVisualizations ? 'Hide' : 'Show'}
               <svg
@@ -195,8 +195,8 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
       {job.status === 'completed' && hasStatistics && (
         <details className="card p-6">
           <summary className="flex items-center gap-3 cursor-pointer list-none">
-            <div className="w-8 h-8 rounded-lg bg-surface-muted flex items-center justify-center">
-              <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 rounded bg-surface-muted flex items-center justify-center">
+              <svg className="w-4 h-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
             </div>
@@ -204,16 +204,16 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
               <h4 className="text-sm font-semibold text-text-primary">
                 Raw Statistics Data
               </h4>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-text-muted font-mono">
                 Click to view JSON data
               </p>
             </div>
-            <span className="badge-neutral">
-              {Object.keys(summary.statistics).length} models
+            <span className="badge-neutral font-mono">
+              {Object.keys(summary.statistics).length} MODELS
             </span>
           </summary>
-          <div className="mt-4 code-block max-h-96 overflow-y-auto">
-            <pre className="text-xs">
+          <div className="mt-4 p-4 bg-surface-muted rounded border border-border max-h-96 overflow-y-auto">
+            <pre className="text-xs font-mono text-text-secondary">
               {JSON.stringify(summary.statistics, null, 2)}
             </pre>
           </div>
@@ -224,7 +224,7 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
       {job.status === 'completed' && (
         <div className="card p-6">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
@@ -233,8 +233,8 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
               <h3 className="text-base font-semibold text-text-primary mb-1">
                 Download Results
               </h3>
-              <p className="text-sm text-text-secondary mb-4">
-                Export your assessment data for further analysis
+              <p className="text-sm text-text-muted font-mono mb-4">
+                Export assessment data for further analysis
               </p>
 
               <div className="flex gap-3">
@@ -248,7 +248,7 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
                   Download CSV
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   onClick={() => handleDownload('json')}
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +258,7 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
                 </Button>
               </div>
 
-              <div className="mt-4 flex items-start gap-2 text-xs text-text-tertiary">
+              <div className="mt-4 flex items-start gap-2 text-xs text-text-muted font-mono">
                 <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -274,8 +274,8 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
       {/* Configuration Review */}
       <div className="card p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-surface-muted flex items-center justify-center">
-            <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-8 h-8 rounded bg-surface-muted flex items-center justify-center">
+            <svg className="w-4 h-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -286,41 +286,41 @@ export function ResultsView({ job, summary, onNewAssessment }: ResultsViewProps)
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="p-3 rounded-lg bg-surface-muted/50">
-            <p className="text-xs text-text-tertiary uppercase tracking-wide mb-1">Scales</p>
+          <div className="p-3 rounded bg-surface-muted border border-border">
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1 font-mono">Scales</p>
             <p className="text-sm text-text-primary font-medium">
               {job.config.scales.join(', ')}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-surface-muted/50">
-            <p className="text-xs text-text-tertiary uppercase tracking-wide mb-1">Models</p>
+          <div className="p-3 rounded bg-surface-muted border border-border">
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1 font-mono">Models</p>
             <p className="text-sm text-text-primary font-medium">
               {job.config.models.length} model{job.config.models.length !== 1 ? 's' : ''}
             </p>
-            <p className="text-xs text-text-secondary mt-0.5 truncate" title={job.config.models.join(', ')}>
+            <p className="text-xs text-text-secondary mt-0.5 truncate font-mono" title={job.config.models.join(', ')}>
               {job.config.models.join(', ')}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-surface-muted/50">
-            <p className="text-xs text-text-tertiary uppercase tracking-wide mb-1">Personas</p>
+          <div className="p-3 rounded bg-surface-muted border border-border">
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1 font-mono">Personas</p>
             <p className="text-sm text-text-primary font-medium">
               {job.config.personas.join(', ')}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-surface-muted/50">
-            <p className="text-xs text-text-tertiary uppercase tracking-wide mb-1">Temperature</p>
-            <p className="text-sm text-text-primary font-medium">
+          <div className="p-3 rounded bg-surface-muted border border-border">
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1 font-mono">Temperature</p>
+            <p className="text-sm text-text-primary font-medium font-mono">
               {job.config.temperature}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-surface-muted/50">
-            <p className="text-xs text-text-tertiary uppercase tracking-wide mb-1">Runs per Item</p>
-            <p className="text-sm text-text-primary font-medium">
+          <div className="p-3 rounded bg-surface-muted border border-border">
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1 font-mono">Runs per Item</p>
+            <p className="text-sm text-text-primary font-medium font-mono">
               {job.config.runs_per_item}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-surface-muted/50">
-            <p className="text-xs text-text-tertiary uppercase tracking-wide mb-1">Job ID</p>
+          <div className="p-3 rounded bg-surface-muted border border-border">
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1 font-mono">Job ID</p>
             <p className="text-xs text-text-primary font-mono truncate" title={job.id}>
               {job.id}
             </p>

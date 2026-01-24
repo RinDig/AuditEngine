@@ -39,24 +39,24 @@ export function ScalesSection({
 
   if (loading) {
     return (
-      <div className="card overflow-hidden">
-        <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+      <div className="card">
+        <div className="px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="icon-container-gray">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 rounded bg-surface-muted flex items-center justify-center">
+              <svg className="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div>
               <h3 className="font-semibold text-text-primary">Scale Selection</h3>
-              <p className="text-sm text-text-secondary">Loading scales...</p>
+              <p className="text-sm text-text-muted font-mono">Loading scales...</p>
             </div>
           </div>
         </div>
         <div className="p-6">
           <div className="animate-pulse space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl" />
+              <div key={i} className="h-20 bg-surface-muted rounded" />
             ))}
           </div>
         </div>
@@ -65,38 +65,38 @@ export function ScalesSection({
   }
 
   return (
-    <div className="card overflow-hidden">
+    <div className="card">
       {/* Header */}
-      <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+      <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="icon-container-accent">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div>
               <h3 className="font-semibold text-text-primary">Scale Selection</h3>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-text-muted font-mono">
                 {selectedScales.length > 0
                   ? `${selectedScales.length} scale${selectedScales.length !== 1 ? 's' : ''} selected (${totalItems} items)`
-                  : 'Select the psychometric scales to include in this assessment'}
+                  : 'Select psychometric instruments to include'}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {selectedScales.length > 0 && (
-              <span className="badge-info">
-                {totalItems} items total
+              <span className="badge-info font-mono">
+                {totalItems} ITEMS
               </span>
             )}
             {onAddCustom && (
               <button
                 type="button"
                 onClick={onAddCustom}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-accent hover:text-accent-hover bg-accent/5 hover:bg-accent/10 rounded-lg transition-colors"
+                className="btn-outline px-3 py-1.5 text-xs"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 Add Custom
@@ -118,20 +118,20 @@ export function ScalesSection({
               <div
                 key={scale.name}
                 className={cn(
-                  'rounded-xl border-2 transition-all cursor-pointer overflow-hidden',
+                  'rounded border transition-all cursor-pointer overflow-hidden',
                   isSelected
-                    ? 'border-accent bg-accent/5 shadow-sm'
-                    : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:bg-white'
+                    ? 'border-accent bg-accent/10'
+                    : 'border-border bg-surface-muted hover:border-border-focus hover:bg-surface-hover'
                 )}
                 onClick={() => toggleScale(scale.name)}
               >
                 <div className="p-4">
                   <div className="flex items-start gap-3">
                     <div className={cn(
-                      'w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-all',
+                      'w-6 h-6 rounded flex items-center justify-center flex-shrink-0 mt-0.5 transition-all',
                       isSelected
-                        ? 'bg-accent text-white'
-                        : 'bg-white border-2 border-gray-200'
+                        ? 'bg-accent text-surface'
+                        : 'bg-surface border border-border'
                     )}>
                       {isSelected && (
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,12 +145,12 @@ export function ScalesSection({
                           {scale.name}
                         </h4>
                         {isCustom && (
-                          <span className="badge-info text-xs">Custom</span>
+                          <span className="badge-accent text-xs">CUSTOM</span>
                         )}
-                        <span className="badge-neutral text-xs">
+                        <span className="badge-neutral text-xs font-mono">
                           {scale.item_count} items
                         </span>
-                        <span className="text-xs text-text-tertiary">
+                        <span className="text-xs text-text-muted font-mono">
                           {scale.scale_range[0]}-{scale.scale_range[1]} scale
                         </span>
                       </div>
@@ -171,7 +171,7 @@ export function ScalesSection({
                             }
                             onRemoveCustom(scale.name)
                           }}
-                          className="p-1.5 text-text-tertiary hover:text-status-error hover:bg-red-50 rounded transition-colors"
+                          className="p-1.5 text-text-muted hover:text-status-error hover:bg-status-error/10 rounded transition-colors"
                           title="Remove custom scale"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,9 +197,9 @@ export function ScalesSection({
                 </div>
 
                 {isPreviewOpen && (
-                  <div className="border-t border-gray-100 bg-white p-4">
+                  <div className="border-t border-border bg-surface-raised p-4">
                     {scale.citation && (
-                      <p className="text-xs text-text-tertiary mb-3 italic px-2">
+                      <p className="text-xs text-text-muted mb-3 italic font-mono px-2">
                         {scale.citation}
                       </p>
                     )}
@@ -207,10 +207,10 @@ export function ScalesSection({
                       {scale.items.slice(0, 5).map((item) => (
                         <div
                           key={item.id}
-                          className="p-3 bg-gray-50 rounded-lg text-sm"
+                          className="p-3 bg-surface-muted rounded text-sm"
                         >
                           <div className="flex items-start gap-2">
-                            <span className="text-xs font-mono text-text-tertiary bg-white px-1.5 py-0.5 rounded flex-shrink-0">
+                            <span className="text-xs font-mono text-accent bg-accent/10 px-1.5 py-0.5 rounded flex-shrink-0">
                               {item.id}
                             </span>
                             <p className="text-text-primary flex-1">{item.text}</p>
@@ -223,7 +223,7 @@ export function ScalesSection({
                         </div>
                       ))}
                       {scale.items.length > 5 && (
-                        <p className="text-xs text-text-tertiary text-center py-2 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-text-muted text-center py-2 bg-surface-muted rounded font-mono">
                           + {scale.items.length - 5} more items
                         </p>
                       )}
@@ -236,12 +236,12 @@ export function ScalesSection({
 
           {scales.length === 0 && (
             <div className="text-center py-12">
-              <div className="icon-container-gray mx-auto mb-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded bg-surface-muted flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-text-secondary font-mono">
                 No scales available. Check backend connection.
               </p>
             </div>

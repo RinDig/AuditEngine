@@ -308,29 +308,28 @@ export default function Home() {
   // Render connection error
   if (backendConnected === false) {
     return (
-      <div className="min-h-screen pt-20">
-        {/* Hero background for error state */}
-        <div className="hero-gradient py-20">
+      <div className="min-h-screen pt-20 bg-surface">
+        <div className="hero py-20">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur mb-6">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-status-error/20 mb-6">
+              <svg className="w-8 h-8 text-status-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-3">
+            <h2 className="text-2xl font-semibold text-text-primary mb-3">
               Backend Connection Failed
             </h2>
-            <p className="text-teal-100 mb-6 max-w-md mx-auto">
+            <p className="text-text-secondary mb-6 max-w-md mx-auto">
               Unable to connect to the Ethics Engine API
             </p>
-            <div className="inline-block bg-white/10 backdrop-blur rounded-xl px-6 py-4 text-left">
-              <p className="text-sm text-teal-100 mb-2">API endpoint:</p>
-              <code className="text-sm text-white font-mono">
+            <div className="card max-w-md mx-auto text-left">
+              <p className="text-xs text-text-muted uppercase tracking-wide mb-2">API endpoint</p>
+              <code className="text-sm text-accent font-mono block mb-4">
                 {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
               </code>
-              <div className="border-t border-white/20 mt-4 pt-4">
-                <p className="text-sm text-teal-100 mb-2">Start the backend:</p>
-                <code className="text-sm text-white font-mono">
+              <div className="border-t border-border pt-4">
+                <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Start the backend</p>
+                <code className="text-sm text-text-primary font-mono">
                   cd backend && uvicorn app.main:app --reload
                 </code>
               </div>
@@ -344,27 +343,27 @@ export default function Home() {
   // Render loading state
   if (loadingData) {
     return (
-      <div className="min-h-screen pt-20">
-        <div className="hero-gradient py-16">
+      <div className="min-h-screen pt-20 bg-surface">
+        <div className="hero py-16">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur mb-6">
-              <svg className="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-accent/20 mb-6">
+              <svg className="w-8 h-8 text-accent animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-3">
-              Loading Ethics Engine
+            <h2 className="text-2xl font-semibold text-text-primary mb-3">
+              Initializing Ethics Engine
             </h2>
-            <p className="text-teal-100">
-              Connecting to backend and loading configuration...
+            <p className="text-text-secondary font-mono text-sm">
+              Connecting to backend...
             </p>
           </div>
         </div>
         <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="space-y-6">
+          <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="card h-32 animate-pulse bg-gradient-to-r from-gray-100 to-gray-50" />
+              <div key={i} className="card h-24 animate-pulse bg-surface-muted" />
             ))}
           </div>
         </div>
@@ -375,25 +374,28 @@ export default function Home() {
   // Render running state
   if (appState === 'running' && currentJob && jobStartTime) {
     return (
-      <div className="min-h-screen pt-20">
-        <div className="hero-gradient py-12">
+      <div className="min-h-screen pt-20 bg-surface">
+        <div className="hero py-12">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span className="status-dot-loading w-3 h-3 rounded-full" />
+              <span className="text-accent font-mono text-sm uppercase tracking-wide">Processing</span>
+            </div>
+            <h2 className="text-2xl font-semibold text-text-primary mb-2">
               Running Assessment
             </h2>
-            <p className="text-teal-100">
-              Processing {currentJob.progress.total_calls.toLocaleString()} API calls across your selected models
+            <p className="text-text-secondary font-mono">
+              {currentJob.progress.total_calls.toLocaleString()} API calls across selected models
             </p>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto px-6 -mt-8">
+        <div className="max-w-6xl mx-auto px-6 -mt-4">
           <JobProgress
             job={currentJob}
             startTime={jobStartTime}
             onCancel={handleCancelJob}
           />
         </div>
-        <div className="section-light py-16" />
       </div>
     )
   }
@@ -401,29 +403,31 @@ export default function Home() {
   // Render results state
   if (appState === 'results' && currentJob) {
     return (
-      <div className="min-h-screen pt-20">
-        <div className={`hero-gradient py-12 ${currentJob.status === 'completed' ? '' : 'bg-gray-800'}`}>
+      <div className="min-h-screen pt-20 bg-surface">
+        <div className="hero py-12">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 backdrop-blur mb-4">
+            <div className={`inline-flex items-center justify-center w-14 h-14 rounded-lg mb-4 ${
+              currentJob.status === 'completed' ? 'bg-status-success/20' : 'bg-status-error/20'
+            }`}>
               {currentJob.status === 'completed' ? (
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-7 h-7 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               ) : (
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-7 h-7 text-status-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               )}
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-semibold text-text-primary mb-2">
               {currentJob.status === 'completed' ? 'Assessment Complete' : currentJob.status === 'failed' ? 'Assessment Failed' : 'Assessment Cancelled'}
             </h2>
-            <p className="text-teal-100">
+            <p className="text-text-secondary font-mono">
               {jobSummary ? `${jobSummary.total_responses.toLocaleString()} responses collected` : 'View your results below'}
             </p>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto px-6 -mt-8 pb-16">
+        <div className="max-w-6xl mx-auto px-6 -mt-4 pb-16">
           <ResultsView
             job={currentJob}
             summary={jobSummary}
@@ -436,33 +440,26 @@ export default function Home() {
 
   // Render configuration state
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 bg-surface">
       {/* Hero Section */}
-      <div className="hero-gradient py-16 mb-8">
+      <div className="hero py-16 mb-8">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur text-teal-100 text-sm font-medium mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Backend Connected
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded bg-status-success/10 border border-status-success/20 text-status-success text-xs font-mono uppercase tracking-wide mb-6">
+            <span className="status-dot-success w-2 h-2 rounded-full" />
+            System Online
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 text-balance">
-            Psychometric Assessment
-            <br />
-            <span className="text-teal-200">for Large Language Models</span>
+          <h1 className="text-4xl md:text-5xl font-semibold text-text-primary mb-4 tracking-tight">
+            Ethics Engine
           </h1>
-          <p className="text-lg text-teal-100 max-w-2xl mx-auto mb-8">
-            Run standardized personality assessments across multiple LLM providers.
-            Compare responses, analyze patterns, and export comprehensive results.
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto mb-8 font-mono">
+            Psychometric assessment of Large Language Models
           </p>
 
           {/* Assessment Mode Tabs */}
-          <div className="inline-flex items-center p-1 bg-white/10 backdrop-blur rounded-xl mb-8">
+          <div className="tabs mb-8">
             <button
               onClick={() => setAssessmentMode('text')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                assessmentMode === 'text'
-                  ? 'bg-white text-teal-700 shadow-lg'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
-              }`}
+              className={`tab ${assessmentMode === 'text' ? 'tab-active' : ''}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -471,11 +468,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => setAssessmentMode('visual')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                assessmentMode === 'visual'
-                  ? 'bg-white text-teal-700 shadow-lg'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
-              }`}
+              className={`tab ${assessmentMode === 'visual' ? 'tab-active' : ''}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -486,33 +479,27 @@ export default function Home() {
 
           {/* Quick Stats - only show for text mode */}
           {assessmentMode === 'text' && (
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2 text-teal-100">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span><strong className="text-white">{scales.length}</strong> Scales Available</span>
+            <div className="flex flex-wrap justify-center gap-8 text-sm font-mono">
+              <div className="flex items-center gap-2 text-text-secondary">
+                <span className="text-accent font-semibold">{scales.length}</span>
+                <span>Scales</span>
               </div>
-              <div className="flex items-center gap-2 text-teal-100">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <span><strong className="text-white">7</strong> Providers Supported</span>
+              <div className="flex items-center gap-2 text-text-secondary">
+                <span className="text-accent font-semibold">7</span>
+                <span>Providers</span>
               </div>
-              <div className="flex items-center gap-2 text-teal-100">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span><strong className="text-white">{allPersonas.length}</strong> Personas</span>
+              <div className="flex items-center gap-2 text-text-secondary">
+                <span className="text-accent font-semibold">{allPersonas.length}</span>
+                <span>Personas</span>
               </div>
             </div>
           )}
 
           {/* Visual mode description */}
           {assessmentMode === 'visual' && (
-            <p className="text-teal-100 text-sm max-w-lg mx-auto">
-              Upload an image and get open-ended responses from vision-capable models across different personas.
-              Perfect for Rorschach tests and visual stimulus analysis.
+            <p className="text-text-muted text-sm font-mono max-w-lg mx-auto">
+              Upload an image and collect open-ended responses from vision-capable models.
+              Ideal for visual stimulus analysis.
             </p>
           )}
         </div>
@@ -521,32 +508,33 @@ export default function Home() {
       {/* Text Assessment Configuration */}
       {assessmentMode === 'text' && (
         <>
-          <div className="section-light">
-            <div className="max-w-6xl mx-auto px-6 py-8">
-              <div className="space-y-6">
-                {/* Section Header */}
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="section-number">1</div>
+          <div className="max-w-6xl mx-auto px-6 py-8">
+            <div className="space-y-8">
+              {/* Section 1: API Keys */}
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="section-number">01</div>
                   <div>
-                    <p className="section-header">Step 1</p>
-                    <h2 className="text-lg font-semibold text-text-primary">Configure API Access</h2>
+                    <h2 className="text-lg font-semibold text-text-primary">API Configuration</h2>
+                    <p className="text-sm text-text-muted font-mono">Connect provider credentials</p>
                   </div>
                 </div>
-
                 <APIKeysSection
                   apiKeys={apiKeys}
                   onKeyChange={handleKeyChange}
                   onValidate={handleKeyValidated}
                 />
+              </div>
 
-                <div className="flex items-center gap-3 mb-2 pt-4">
-                  <div className="section-number">2</div>
+              {/* Section 2: Scales */}
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="section-number">02</div>
                   <div>
-                    <p className="section-header">Step 2</p>
-                    <h2 className="text-lg font-semibold text-text-primary">Select Assessment Scales</h2>
+                    <h2 className="text-lg font-semibold text-text-primary">Assessment Scales</h2>
+                    <p className="text-sm text-text-muted font-mono">Select psychometric instruments</p>
                   </div>
                 </div>
-
                 <ScalesSection
                   scales={allScales}
                   selectedScales={selectedScales}
@@ -554,29 +542,33 @@ export default function Home() {
                   onAddCustom={() => setShowCustomScaleModal(true)}
                   onRemoveCustom={handleRemoveCustomScale}
                 />
+              </div>
 
-                <div className="flex items-center gap-3 mb-2 pt-4">
-                  <div className="section-number">3</div>
+              {/* Section 3: Models */}
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="section-number">03</div>
                   <div>
-                    <p className="section-header">Step 3</p>
-                    <h2 className="text-lg font-semibold text-text-primary">Choose Models to Test</h2>
+                    <h2 className="text-lg font-semibold text-text-primary">Model Selection</h2>
+                    <p className="text-sm text-text-muted font-mono">Choose models to evaluate</p>
                   </div>
                 </div>
-
                 <ModelsSection
                   apiKeys={apiKeys}
                   selectedModels={selectedModels}
                   onSelectionChange={setSelectedModels}
                 />
+              </div>
 
-                <div className="flex items-center gap-3 mb-2 pt-4">
-                  <div className="section-number">4</div>
+              {/* Section 4: Personas */}
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="section-number">04</div>
                   <div>
-                    <p className="section-header">Step 4</p>
-                    <h2 className="text-lg font-semibold text-text-primary">Select Personas</h2>
+                    <h2 className="text-lg font-semibold text-text-primary">Persona Configuration</h2>
+                    <p className="text-sm text-text-muted font-mono">Define ideological framings</p>
                   </div>
                 </div>
-
                 <PersonasSection
                   personas={allPersonas}
                   selectedPersonas={selectedPersonas}
@@ -586,15 +578,17 @@ export default function Home() {
                   onAIGenerate={() => setShowAIPersonaModal(true)}
                   hasAIProviders={aiProviders.length > 0}
                 />
+              </div>
 
-                <div className="flex items-center gap-3 mb-2 pt-4">
-                  <div className="section-number">5</div>
+              {/* Section 5: Run Configuration */}
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="section-number">05</div>
                   <div>
-                    <p className="section-header">Step 5</p>
-                    <h2 className="text-lg font-semibold text-text-primary">Run Configuration</h2>
+                    <h2 className="text-lg font-semibold text-text-primary">Run Parameters</h2>
+                    <p className="text-sm text-text-muted font-mono">Configure execution settings</p>
                   </div>
                 </div>
-
                 <ConfigSection
                   temperature={temperature}
                   runsPerItem={runsPerItem}
@@ -604,49 +598,49 @@ export default function Home() {
                   onTemperatureChange={setTemperature}
                   onRunsPerItemChange={setRunsPerItem}
                 />
-
-                {/* Error Display */}
-                {error && (
-                  <div className="flex items-center gap-3 p-4 bg-status-error/10 border border-status-error/20 rounded-xl">
-                    <svg className="w-5 h-5 text-status-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p className="text-sm text-status-error">{error}</p>
-                  </div>
-                )}
               </div>
+
+              {/* Error Display */}
+              {error && (
+                <div className="flex items-center gap-3 p-4 bg-status-error/10 border border-status-error/30 rounded">
+                  <svg className="w-5 h-5 text-status-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm text-status-error font-mono">{error}</p>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Sticky Submit Footer */}
-          <div className="sticky bottom-0 bg-white/80 backdrop-blur-xl border-t border-gray-200 shadow-lg shadow-black/5">
+          <div className="sticky bottom-0 bg-surface-raised/95 backdrop-blur border-t border-border">
             <div className="max-w-6xl mx-auto px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-6">
                   {canSubmit ? (
                     <>
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span className="text-sm font-medium text-emerald-700">Ready to run</span>
+                        <span className="status-dot-success w-2 h-2 rounded-full" />
+                        <span className="text-sm font-medium text-status-success font-mono uppercase tracking-wide">Ready</span>
                       </div>
-                      <div className="hidden sm:flex items-center gap-4 text-sm text-text-secondary">
+                      <div className="hidden sm:flex items-center gap-4 text-sm text-text-muted font-mono">
                         <span>{selectedScales.length} scale{selectedScales.length !== 1 ? 's' : ''}</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                        <span className="text-border">|</span>
                         <span>{selectedModels.length} model{selectedModels.length !== 1 ? 's' : ''}</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                        <span className="text-border">|</span>
                         <span>{selectedPersonas.length} persona{selectedPersonas.length !== 1 ? 's' : ''}</span>
                       </div>
                     </>
                   ) : (
-                    <p className="text-sm text-text-secondary">
+                    <p className="text-sm text-text-muted font-mono">
                       {Object.values(apiKeys).every((k) => k.status !== 'valid')
-                        ? 'Connect at least one API provider to continue'
+                        ? 'Connect at least one API provider'
                         : selectedScales.length === 0
-                          ? 'Select at least one scale to continue'
+                          ? 'Select at least one scale'
                           : selectedModels.length === 0
-                            ? 'Select at least one model to continue'
+                            ? 'Select at least one model'
                             : selectedPersonas.length === 0
-                              ? 'Select at least one persona to continue'
+                              ? 'Select at least one persona'
                               : ''}
                     </p>
                   )}
@@ -662,7 +656,7 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Start Assessment
+                  Execute Assessment
                 </Button>
               </div>
             </div>

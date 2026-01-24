@@ -95,12 +95,12 @@ export function AIPersonaGeneratorModal({
     >
       <div className="space-y-5">
         {noProviders ? (
-          <div className="p-6 bg-amber-50 border border-amber-200 rounded-xl text-center">
-            <svg className="w-10 h-10 text-amber-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-6 bg-status-warning/10 border border-status-warning/30 rounded text-center">
+            <svg className="w-10 h-10 text-status-warning mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <h4 className="font-semibold text-amber-800 mb-1">No API Keys Connected</h4>
-            <p className="text-sm text-amber-700">
+            <h4 className="font-semibold text-status-warning mb-1">No API Keys Connected</h4>
+            <p className="text-sm text-text-secondary">
               Connect an OpenAI or Anthropic API key to use AI persona generation.
             </p>
           </div>
@@ -187,8 +187,8 @@ export function AIPersonaGeneratorModal({
 
             {/* Error Display */}
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="p-3 bg-status-error/10 border border-status-error/30 rounded">
+                <p className="text-sm text-status-error">{error}</p>
               </div>
             )}
 
@@ -212,18 +212,18 @@ export function AIPersonaGeneratorModal({
                         key={persona.id}
                         onClick={() => togglePersona(persona.id)}
                         className={cn(
-                          'p-4 rounded-xl border-2 cursor-pointer transition-all',
+                          'p-4 rounded border cursor-pointer transition-all',
                           isSelected
-                            ? 'border-accent bg-accent/5'
-                            : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                            ? 'border-accent bg-accent/10'
+                            : 'border-border bg-surface-muted hover:border-text-tertiary'
                         )}
                       >
                         <div className="flex items-start gap-3">
                           <div className={cn(
                             'w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 transition-all',
                             isSelected
-                              ? 'bg-accent text-white'
-                              : 'bg-white border-2 border-gray-300'
+                              ? 'bg-accent text-surface'
+                              : 'bg-surface border border-border'
                           )}>
                             {isSelected && (
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,9 +240,9 @@ export function AIPersonaGeneratorModal({
                                 {persona.description}
                               </p>
                             )}
-                            <div className="mt-2 p-2 bg-white rounded-lg border border-gray-100">
-                              <p className="text-xs text-text-tertiary">
-                                <span className="font-medium">Prompt:</span> {persona.prompt_prefix}
+                            <div className="mt-2 p-2 bg-surface rounded border border-border">
+                              <p className="text-xs text-text-tertiary font-mono">
+                                <span className="font-medium text-text-secondary">Prompt:</span> {persona.prompt_prefix}
                               </p>
                             </div>
                           </div>
@@ -257,7 +257,7 @@ export function AIPersonaGeneratorModal({
         )}
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+        <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="ghost" onClick={handleClose}>
             Cancel
           </Button>

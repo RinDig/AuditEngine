@@ -26,18 +26,18 @@ export function ConfigSection({
   const estimatedTime = estimateRunTime(totalCalls, totalModels > 0 ? 1 : 0)
 
   return (
-    <div className="card overflow-hidden">
+    <div className="card">
       {/* Header */}
-      <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+      <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="icon-container-accent">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+            <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
           </div>
           <div>
             <h3 className="font-semibold text-text-primary">Run Configuration</h3>
-            <p className="text-sm text-text-secondary">Fine-tune your assessment parameters</p>
+            <p className="text-sm text-text-muted font-mono">Configure execution parameters</p>
           </div>
         </div>
       </div>
@@ -73,64 +73,65 @@ export function ConfigSection({
                 )
               }
               className="w-full"
+              mono
             />
-            <p className="text-xs text-text-tertiary">
+            <p className="text-xs text-text-muted font-mono">
               Higher values enable variance analysis (1-20)
             </p>
           </div>
         </div>
 
         {/* Summary Card */}
-        <div className="p-5 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-200/50 space-y-4">
+        <div className="p-5 bg-surface-muted rounded border border-border space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-text-primary">
               Assessment Summary
             </h4>
-            <span className="badge-neutral">
-              {formatNumber(totalCalls)} calls
+            <span className="badge-accent font-mono">
+              {formatNumber(totalCalls)} CALLS
             </span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="stat-card">
-              <p className="stat-label">Items</p>
-              <p className="stat-value text-2xl">
+            <div className="p-3 bg-surface-raised rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Items</p>
+              <p className="text-2xl font-semibold text-text-primary font-mono">
                 {formatNumber(totalItems)}
               </p>
             </div>
-            <div className="stat-card">
-              <p className="stat-label">Models</p>
-              <p className="stat-value text-2xl">
+            <div className="p-3 bg-surface-raised rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Models</p>
+              <p className="text-2xl font-semibold text-text-primary font-mono">
                 {formatNumber(totalModels)}
               </p>
             </div>
-            <div className="stat-card">
-              <p className="stat-label">Personas</p>
-              <p className="stat-value text-2xl">
+            <div className="p-3 bg-surface-raised rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Personas</p>
+              <p className="text-2xl font-semibold text-text-primary font-mono">
                 {formatNumber(totalPersonas)}
               </p>
             </div>
-            <div className="stat-card">
-              <p className="stat-label">Runs</p>
-              <p className="stat-value text-2xl">
+            <div className="p-3 bg-surface-raised rounded border border-border">
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wide">Runs</p>
+              <p className="text-2xl font-semibold text-text-primary font-mono">
                 {formatNumber(runsPerItem)}
               </p>
             </div>
           </div>
 
-          <div className="flex justify-between items-center pt-4 border-t border-gray-200/50">
+          <div className="flex justify-between items-center pt-4 border-t border-border">
             <div>
               <p className="text-sm text-text-primary">
-                <span className="text-lg font-bold text-accent-gradient">{formatNumber(totalCalls)}</span>{' '}
+                <span className="text-2xl font-bold text-accent font-mono">{formatNumber(totalCalls)}</span>{' '}
                 <span className="text-text-secondary">total API calls</span>
               </p>
-              <p className="text-xs text-text-tertiary mt-0.5">
+              <p className="text-xs text-text-muted mt-0.5 font-mono">
                 {totalItems} x {totalModels} x {totalPersonas} x {runsPerItem}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-text-tertiary uppercase tracking-wide">Est. time</p>
-              <p className="text-lg font-bold text-text-primary">
+              <p className="text-xs text-text-muted uppercase tracking-wide font-mono">Est. time</p>
+              <p className="text-lg font-bold text-text-primary font-mono">
                 {totalCalls > 0 ? estimatedTime : '--'}
               </p>
             </div>
@@ -139,22 +140,22 @@ export function ConfigSection({
 
         {/* Notes */}
         {temperature > 0 && (
-          <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200/50 rounded-lg">
-            <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-start gap-2 p-3 bg-status-warning/10 border border-status-warning/20 rounded">
+            <svg className="w-4 h-4 text-status-warning mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-xs text-amber-700">
+            <p className="text-xs text-status-warning font-mono">
               Temperature {`>`} 0 introduces randomness. Consider multiple runs per item to measure response variance.
             </p>
           </div>
         )}
 
         {temperature === 0 && runsPerItem > 1 && (
-          <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200/50 rounded-lg">
-            <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-start gap-2 p-3 bg-accent/10 border border-accent/20 rounded">
+            <svg className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-xs text-blue-700">
+            <p className="text-xs text-accent font-mono">
               With temperature = 0, responses are deterministic. Multiple runs will produce identical results.
             </p>
           </div>

@@ -87,31 +87,28 @@ export function APIKeysSection({
   ).length
 
   return (
-    <div className="card overflow-hidden">
-      {/* Header with gradient accent */}
-      <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+    <div className="card">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="icon-container-accent">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 rounded bg-accent/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
             </div>
             <div>
               <h3 className="font-semibold text-text-primary">API Configuration</h3>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-text-muted font-mono">
                 {connectedCount > 0
                   ? `${connectedCount} provider${connectedCount !== 1 ? 's' : ''} connected`
-                  : 'Configure your API keys to enable model access'}
+                  : 'Configure credentials to enable model access'}
               </p>
             </div>
           </div>
           {connectedCount > 0 && (
-            <span className="badge-success">
-              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              {connectedCount} Active
+            <span className="badge-success font-mono">
+              {connectedCount} ACTIVE
             </span>
           )}
         </div>
@@ -128,12 +125,16 @@ export function APIKeysSection({
             return (
               <div
                 key={provider.id}
-                className={`provider-card ${isConnected ? 'provider-card-active' : ''}`}
+                className={`p-4 rounded border transition-all ${
+                  isConnected
+                    ? 'border-status-success/30 bg-status-success/5'
+                    : 'border-border bg-surface-muted hover:bg-surface-hover'
+                }`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      isConnected ? 'bg-accent/10 text-accent' : 'bg-gray-100 text-gray-500'
+                    <div className={`w-8 h-8 rounded flex items-center justify-center ${
+                      isConnected ? 'bg-status-success/20 text-status-success' : 'bg-surface-hover text-text-muted'
                     }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -143,7 +144,7 @@ export function APIKeysSection({
                       <h4 className="text-sm font-semibold text-text-primary">
                         {provider.name}
                       </h4>
-                      <p className="text-xs text-text-secondary">
+                      <p className="text-xs text-text-muted font-mono">
                         {provider.description}
                       </p>
                     </div>
@@ -163,11 +164,11 @@ export function APIKeysSection({
                       onChange={(e) =>
                         onKeyChange(provider.id, e.target.value, keyState.baseUrl)
                       }
-                      className="font-mono text-xs"
+                      mono
                     />
                   </div>
                   <Button
-                    variant={isConnected ? 'ghost' : 'secondary'}
+                    variant={isConnected ? 'ghost' : 'outline'}
                     size="sm"
                     onClick={() => handleValidate(provider.id)}
                     disabled={!keyState.key || isValidating}
@@ -186,13 +187,13 @@ export function APIKeysSection({
                         onKeyChange(provider.id, keyState.key, e.target.value)
                       }
                       hint={`Required for ${provider.name}`}
-                      className="text-xs"
+                      mono
                     />
                   </div>
                 )}
 
                 {keyState.status === 'invalid' && keyState.error && (
-                  <p className="text-xs text-status-error mt-2">{keyState.error}</p>
+                  <p className="text-xs text-status-error mt-2 font-mono">{keyState.error}</p>
                 )}
               </div>
             )
@@ -200,11 +201,11 @@ export function APIKeysSection({
         </div>
 
         {/* Security note */}
-        <div className="mt-6 flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
-          <svg className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="mt-6 flex items-start gap-3 p-4 bg-surface-muted rounded border border-border">
+          <svg className="w-4 h-4 text-text-muted mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          <p className="text-xs text-text-tertiary">
+          <p className="text-xs text-text-muted font-mono">
             API keys are stored in your browser session only. When you run an assessment,
             keys are sent securely (HTTPS) to our backend, used in-memory to make API calls,
             then discarded when the job completes. Keys are never persisted to disk or database.

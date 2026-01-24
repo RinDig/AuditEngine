@@ -52,20 +52,20 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="modal-backdrop"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div
         className={cn(
-          'relative w-full mx-4 bg-white rounded-2xl shadow-2xl',
+          'modal-content',
           'animate-in fade-in zoom-in-95 duration-200',
           sizeStyles[size]
         )}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100">
+        <div className="modal-header">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
@@ -75,7 +75,7 @@ export function Modal({
             </div>
             <button
               onClick={onClose}
-              className="p-2 -m-2 text-text-tertiary hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 -m-2 text-text-muted hover:text-text-primary hover:bg-surface-hover rounded transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -85,7 +85,7 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+        <div className="modal-body">
           {children}
         </div>
       </div>

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,344 +12,594 @@
   }
 
   body {
-    @apply text-text-primary;
-    background: linear-gradient(180deg, #F8FAFB 0%, #F1F5F4 100%);
+    @apply bg-surface text-text-primary font-sans;
     min-height: 100vh;
   }
 
-  /* Custom focus styles for accessibility */
+  /* Custom focus styles - cyan glow */
   *:focus-visible {
-    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-surface;
+    @apply outline-none ring-1 ring-accent ring-offset-1 ring-offset-surface;
   }
 
-  /* Subtle selection color */
+  /* Selection color */
   ::selection {
-    @apply bg-accent/20 text-text-primary;
+    @apply bg-accent/30 text-text-primary;
+  }
+
+  /* Monospace for numbers */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 @layer components {
-  /* Hero gradient background */
-  .hero-gradient {
-    background: linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%);
-    position: relative;
-    overflow: hidden;
+  /* ============================================
+     HEADER / NAVIGATION
+     ============================================ */
+  .header {
+    @apply fixed top-0 left-0 right-0 z-50;
+    @apply bg-surface/90 backdrop-blur-xl border-b border-border;
   }
 
-  .hero-gradient::before {
+  .header-content {
+    @apply max-w-7xl mx-auto px-6 h-16 flex items-center justify-between;
+  }
+
+  .logo {
+    @apply font-mono font-bold text-lg text-text-primary;
+  }
+
+  .logo-accent {
+    @apply text-accent;
+  }
+
+  /* ============================================
+     HERO SECTION - Clinical Style
+     ============================================ */
+  .hero {
+    @apply relative pt-24 pb-12 px-6;
+    @apply border-b border-border;
+    background:
+      linear-gradient(180deg, rgba(0, 217, 255, 0.03) 0%, transparent 50%),
+      #0A0A0B;
+  }
+
+  .hero::before {
     content: '';
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(20, 184, 166, 0.3) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(20, 184, 166, 0.15) 0%, transparent 50%);
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0, 217, 255, 0.08) 0%, transparent 60%);
     pointer-events: none;
   }
 
-  /* Dark section for contrast */
-  .section-dark {
-    @apply bg-gray-900 text-white;
-    background: linear-gradient(180deg, #111827 0%, #1F2937 100%);
+  .hero-title {
+    @apply font-mono font-bold text-4xl md:text-5xl text-text-primary tracking-tight;
   }
 
-  /* Light section with subtle pattern */
-  .section-light {
-    @apply bg-white;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(15, 118, 110, 0.03) 1px, transparent 0);
-    background-size: 32px 32px;
+  .hero-subtitle {
+    @apply text-text-secondary text-lg max-w-2xl;
   }
 
-  /* Card component - enhanced with more presence */
-  .card {
-    @apply bg-white border border-gray-200/80 rounded-2xl;
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 0.05),
-      0 4px 6px -2px rgb(0 0 0 / 0.03),
-      0 10px 20px -5px rgb(0 0 0 / 0.03);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .card:hover {
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 0.06),
-      0 8px 12px -4px rgb(0 0 0 / 0.06),
-      0 20px 40px -10px rgb(0 0 0 / 0.06);
-    transform: translateY(-2px);
-  }
-
-  /* Card with accent top border */
-  .card-accent {
-    @apply card relative overflow-hidden;
-  }
-
-  .card-accent::before {
-    content: '';
-    @apply absolute top-0 left-0 right-0 h-1;
-    background: linear-gradient(90deg, #0F766E 0%, #14B8A6 50%, #0F766E 100%);
-  }
-
-  /* Card dark variant */
-  .card-dark {
-    @apply bg-gray-900 border-gray-800 text-white;
-  }
-
-  .card-dark:hover {
-    @apply border-gray-700;
-  }
-
-  /* Section wrapper with proper spacing */
-  .section-wrapper {
+  /* ============================================
+     SECTION LAYOUTS
+     ============================================ */
+  .section {
     @apply py-8 px-6;
   }
 
-  .section-wrapper-lg {
-    @apply py-12 px-6;
-  }
-
-  /* Section number badge */
-  .section-number {
-    @apply w-8 h-8 rounded-full bg-accent text-white text-sm font-semibold;
-    @apply flex items-center justify-center flex-shrink-0;
-    box-shadow: 0 2px 8px -2px rgba(15, 118, 110, 0.4);
-  }
-
-  /* Section header */
   .section-header {
-    @apply text-xs font-semibold uppercase tracking-wider text-accent;
+    @apply flex items-center gap-4 mb-6;
   }
 
-  /* Input field base styles - more prominent */
-  .input-base {
-    @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl;
-    @apply text-text-primary placeholder:text-gray-400;
+  .section-number {
+    @apply font-mono text-2xl font-bold text-accent;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+  }
+
+  .section-title {
+    @apply font-mono text-sm font-semibold text-text-secondary uppercase tracking-widest;
+  }
+
+  .section-divider {
+    @apply flex-1 h-px bg-border ml-4;
+  }
+
+  /* ============================================
+     CARDS - Dark Clinical Style
+     ============================================ */
+  .card {
+    @apply bg-surface-muted border border-border rounded-lg;
     @apply transition-all duration-200;
   }
 
-  .input-base:hover {
-    @apply border-gray-300 bg-white;
+  .card:hover {
+    @apply border-border-strong;
   }
 
-  .input-base:focus {
-    @apply border-accent ring-4 ring-accent/10 bg-white outline-none;
+  .card-body {
+    @apply p-5;
   }
 
-  /* Button variants - bold and modern */
+  .card-header {
+    @apply px-5 py-4 border-b border-border;
+    @apply flex items-center justify-between;
+  }
+
+  .card-title {
+    @apply font-mono font-semibold text-text-primary;
+  }
+
+  /* Card with accent border */
+  .card-accent {
+    @apply card border-l-2 border-l-accent;
+  }
+
+  /* Card for provider/config sections */
+  .card-interactive {
+    @apply card cursor-pointer;
+  }
+
+  .card-interactive:hover {
+    @apply bg-surface-hover border-accent/30;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.05);
+  }
+
+  .card-interactive.active {
+    @apply border-accent bg-accent-muted;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.1);
+  }
+
+  /* ============================================
+     BUTTONS - Sharp, Clinical
+     ============================================ */
   .btn {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl;
-    @apply font-semibold text-sm;
-    @apply transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-4 py-2.5 rounded font-mono font-medium text-sm;
+    @apply transition-all duration-150;
+    @apply disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply btn text-white;
-    background: linear-gradient(135deg, #0F766E 0%, #0D9488 100%);
-    box-shadow: 0 2px 8px -2px rgba(15, 118, 110, 0.5), 0 4px 16px -4px rgba(15, 118, 110, 0.3);
+    @apply btn bg-accent text-surface;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%);
-    box-shadow: 0 4px 12px -2px rgba(15, 118, 110, 0.6), 0 8px 24px -4px rgba(15, 118, 110, 0.4);
-    transform: translateY(-2px);
+    @apply bg-accent-hover;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
   }
 
   .btn-primary:active:not(:disabled) {
-    transform: translateY(0);
+    transform: scale(0.98);
   }
 
   .btn-secondary {
-    @apply btn bg-white text-gray-700 border border-gray-200;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
+    @apply btn bg-transparent text-text-primary border border-border;
   }
 
   .btn-secondary:hover:not(:disabled) {
-    @apply bg-gray-50 border-gray-300 text-gray-900;
-    box-shadow: 0 2px 6px 0 rgb(0 0 0 / 0.06);
-    transform: translateY(-1px);
+    @apply border-accent text-accent;
   }
 
   .btn-ghost {
-    @apply btn text-gray-600;
+    @apply btn bg-transparent text-text-secondary;
   }
 
   .btn-ghost:hover:not(:disabled) {
-    @apply bg-gray-100 text-gray-900;
+    @apply text-text-primary bg-surface-hover;
   }
 
-  /* Large button variant */
+  .btn-danger {
+    @apply btn bg-transparent text-status-error border border-status-error/30;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    @apply bg-status-error/10;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
   .btn-lg {
-    @apply px-8 py-4 text-base rounded-2xl;
+    @apply px-6 py-3 text-base;
   }
 
-  /* Checkbox styles - larger and more prominent */
-  .checkbox {
-    @apply w-5 h-5 rounded-md border-2 border-gray-300 text-accent cursor-pointer;
+  /* ============================================
+     INPUTS - Dark with Mono Font
+     ============================================ */
+  .input {
+    @apply w-full px-4 py-3 rounded;
+    @apply bg-surface-muted border border-border;
+    @apply text-text-primary placeholder:text-text-tertiary;
+    @apply font-mono text-sm;
     @apply transition-all duration-150;
-    @apply focus:ring-4 focus:ring-accent/20 focus:ring-offset-0;
-    @apply checked:bg-accent checked:border-accent;
+  }
+
+  .input:hover {
+    @apply border-border-strong;
+  }
+
+  .input:focus {
+    @apply border-accent bg-surface outline-none;
+    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+  }
+
+  .input-error {
+    @apply border-status-error;
+  }
+
+  .input-error:focus {
+    @apply border-status-error;
+    box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1);
+  }
+
+  .input-label {
+    @apply block font-mono text-xs font-medium text-text-secondary uppercase tracking-wider mb-2;
+  }
+
+  .input-hint {
+    @apply text-xs text-text-tertiary mt-1;
+  }
+
+  .input-error-text {
+    @apply text-xs text-status-error mt-1;
+  }
+
+  /* ============================================
+     CHECKBOXES - Cyan Accent
+     ============================================ */
+  .checkbox {
+    @apply w-5 h-5 rounded-sm;
+    @apply bg-surface-muted border-2 border-border;
+    @apply transition-all duration-150 cursor-pointer;
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   .checkbox:hover {
     @apply border-accent/50;
   }
 
-  /* Status indicator with glow */
+  .checkbox:checked {
+    @apply bg-accent border-accent;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%230A0A0B' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .checkbox:focus {
+    @apply outline-none;
+    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
+  }
+
+  /* ============================================
+     STATUS INDICATORS - Glowing
+     ============================================ */
   .status-dot {
-    @apply w-3 h-3 rounded-full;
+    @apply w-2.5 h-2.5 rounded-full;
   }
 
   .status-dot-success {
-    @apply status-dot bg-emerald-500;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 0 12px 0 rgba(16, 185, 129, 0.3);
+    @apply status-dot bg-status-success;
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+    animation: pulse-glow 2s ease-in-out infinite;
   }
 
   .status-dot-warning {
-    @apply status-dot bg-amber-500;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2), 0 0 12px 0 rgba(245, 158, 11, 0.3);
+    @apply status-dot bg-status-warning;
+    box-shadow: 0 0 8px rgba(255, 184, 0, 0.5);
   }
 
   .status-dot-error {
-    @apply status-dot bg-red-500;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2), 0 0 12px 0 rgba(239, 68, 68, 0.3);
+    @apply status-dot bg-status-error;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
   }
 
-  .status-dot-neutral {
-    @apply status-dot bg-gray-400;
+  .status-dot-idle {
+    @apply status-dot bg-text-tertiary;
   }
 
-  /* Progress bar - bolder */
+  .status-dot-loading {
+    @apply status-dot bg-accent;
+    box-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
+    animation: pulse-glow 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* ============================================
+     PROGRESS BAR - Segmented
+     ============================================ */
   .progress-bar {
-    @apply h-3 bg-gray-100 rounded-full overflow-hidden;
+    @apply h-2 bg-surface-muted rounded-full overflow-hidden;
+    @apply relative;
   }
 
-  .progress-bar-fill {
-    @apply h-full rounded-full;
-    background: linear-gradient(90deg, #0F766E 0%, #14B8A6 100%);
-    box-shadow: 0 0 12px 0 rgba(15, 118, 110, 0.4);
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  .progress-bar::before {
+    content: '';
+    @apply absolute inset-0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 10%,
+      rgba(0, 217, 255, 0.1) 10%,
+      rgba(0, 217, 255, 0.1) 10.5%
+    );
   }
 
-  /* Divider */
-  .divider {
-    @apply border-t border-gray-200;
+  .progress-fill {
+    @apply h-full bg-accent rounded-full;
+    @apply transition-all duration-500 ease-out;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
   }
 
-  /* Stats card - bold design */
-  .stat-card {
-    @apply p-5 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100/50 border border-gray-200/50;
-    @apply transition-all duration-200;
+  /* Large progress bar */
+  .progress-bar-lg {
+    @apply h-3;
   }
 
-  .stat-card:hover {
-    @apply from-white to-gray-50 border-gray-200;
-    transform: translateY(-1px);
-  }
-
-  .stat-value {
-    @apply text-3xl font-bold text-gray-900;
-    font-feature-settings: 'tnum' 1;
-  }
-
-  .stat-label {
-    @apply text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1;
-  }
-
-  /* Badge - more prominent */
+  /* ============================================
+     BADGES - Pill Style with Glow
+     ============================================ */
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full;
+    @apply font-mono text-xs font-medium;
   }
 
   .badge-success {
-    @apply badge bg-emerald-100 text-emerald-700;
+    @apply badge bg-status-success/10 text-status-success;
   }
 
   .badge-warning {
-    @apply badge bg-amber-100 text-amber-700;
+    @apply badge bg-status-warning/10 text-status-warning;
   }
 
   .badge-error {
-    @apply badge bg-red-100 text-red-700;
+    @apply badge bg-status-error/10 text-status-error;
   }
 
   .badge-info {
-    @apply badge bg-blue-100 text-blue-700;
+    @apply badge bg-accent/10 text-accent;
   }
 
   .badge-neutral {
-    @apply badge bg-gray-100 text-gray-600;
+    @apply badge bg-surface-hover text-text-secondary;
   }
 
-  /* Code/Pre block styling */
-  .code-block {
-    @apply bg-gray-900 border border-gray-800 rounded-xl p-5;
-    @apply text-sm font-mono text-gray-300;
-    @apply overflow-x-auto;
+  /* ============================================
+     STATS / METRICS - Large Mono Numbers
+     ============================================ */
+  .stat-card {
+    @apply p-4 rounded-lg bg-surface-muted border border-border;
   }
 
-  /* Accent text gradient */
-  .text-accent-gradient {
-    background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .stat-value {
+    @apply font-mono text-3xl font-bold text-text-primary tabular-nums;
   }
 
-  /* Glow effect for success states */
-  .glow-success {
-    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2), 0 0 30px -5px rgba(16, 185, 129, 0.2);
+  .stat-label {
+    @apply font-mono text-xs text-text-tertiary uppercase tracking-wider;
   }
 
-  /* Provider card in config */
+  .stat-accent {
+    @apply text-accent;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+  }
+
+  /* ============================================
+     MODALS - Dark Overlay
+     ============================================ */
+  .modal-backdrop {
+    @apply fixed inset-0 z-50 bg-black/70 backdrop-blur-sm;
+    @apply flex items-center justify-center p-4;
+  }
+
+  .modal {
+    @apply bg-surface-raised border border-border rounded-lg;
+    @apply w-full max-h-[90vh] overflow-hidden;
+    @apply shadow-2xl;
+    animation: modal-enter 0.2s ease-out;
+  }
+
+  @keyframes modal-enter {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .modal-sm { @apply max-w-md; }
+  .modal-md { @apply max-w-lg; }
+  .modal-lg { @apply max-w-2xl; }
+  .modal-xl { @apply max-w-4xl; }
+
+  .modal-header {
+    @apply px-6 py-4 border-b border-border;
+    @apply flex items-center justify-between;
+  }
+
+  .modal-title {
+    @apply font-mono font-semibold text-lg text-text-primary;
+  }
+
+  .modal-body {
+    @apply p-6 overflow-y-auto;
+  }
+
+  .modal-footer {
+    @apply px-6 py-4 border-t border-border;
+    @apply flex items-center justify-end gap-3;
+  }
+
+  /* ============================================
+     TABS / MODE SWITCHER
+     ============================================ */
+  .tabs {
+    @apply inline-flex items-center p-1 rounded-lg bg-surface-muted border border-border;
+  }
+
+  .tab {
+    @apply px-4 py-2 rounded font-mono text-sm font-medium;
+    @apply text-text-secondary transition-all duration-150;
+  }
+
+  .tab:hover {
+    @apply text-text-primary;
+  }
+
+  .tab-active {
+    @apply bg-accent text-surface;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+  }
+
+  /* ============================================
+     SLIDER - Segmented Track
+     ============================================ */
+  .slider {
+    @apply w-full h-2 rounded-full bg-surface-muted;
+    @apply appearance-none cursor-pointer;
+  }
+
+  .slider::-webkit-slider-thumb {
+    @apply appearance-none w-5 h-5 rounded-full bg-accent;
+    @apply cursor-pointer;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+  }
+
+  .slider::-moz-range-thumb {
+    @apply w-5 h-5 rounded-full bg-accent border-0;
+    @apply cursor-pointer;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+  }
+
+  /* ============================================
+     PROVIDER CARDS
+     ============================================ */
   .provider-card {
-    @apply p-5 rounded-xl bg-gray-50/50 border border-gray-200/50;
-    @apply transition-all duration-200;
+    @apply p-4 rounded-lg bg-surface-muted border border-border;
+    @apply transition-all duration-150;
   }
 
   .provider-card:hover {
-    @apply bg-white border-gray-200;
+    @apply border-border-strong;
   }
 
-  .provider-card-active {
-    @apply bg-accent/5 border-accent/30;
+  .provider-card.connected {
+    @apply border-l-2 border-l-status-success;
   }
 
-  /* Feature list item */
-  .feature-item {
-    @apply flex items-start gap-3 p-4 rounded-xl;
-    @apply transition-all duration-200;
+  .provider-card.error {
+    @apply border-l-2 border-l-status-error;
   }
 
-  .feature-item:hover {
-    @apply bg-gray-50;
+  .provider-name {
+    @apply font-mono font-semibold text-text-primary;
   }
 
-  /* Icon container */
-  .icon-container {
-    @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0;
+  .provider-status {
+    @apply font-mono text-xs text-text-secondary;
   }
 
-  .icon-container-accent {
-    @apply icon-container bg-accent/10 text-accent;
+  /* ============================================
+     DATA TABLE STYLE
+     ============================================ */
+  .data-table {
+    @apply w-full;
   }
 
-  .icon-container-gray {
-    @apply icon-container bg-gray-100 text-gray-600;
+  .data-table th {
+    @apply px-4 py-3 text-left;
+    @apply font-mono text-xs font-semibold text-text-tertiary uppercase tracking-wider;
+    @apply border-b border-border;
   }
 
-  /* Collapsible section header */
-  .collapsible-header {
-    @apply flex items-center justify-between p-5 cursor-pointer;
-    @apply transition-colors duration-200;
+  .data-table td {
+    @apply px-4 py-3;
+    @apply font-mono text-sm text-text-primary;
+    @apply border-b border-border;
   }
 
-  .collapsible-header:hover {
-    @apply bg-gray-50/50;
+  .data-table tr:hover td {
+    @apply bg-surface-hover;
+  }
+
+  /* ============================================
+     FOOTER
+     ============================================ */
+  .footer {
+    @apply py-6 px-6 border-t border-border;
+  }
+
+  .footer-text {
+    @apply font-mono text-xs text-text-tertiary;
+  }
+
+  /* ============================================
+     STICKY SUBMIT BAR
+     ============================================ */
+  .submit-bar {
+    @apply sticky bottom-0 z-40;
+    @apply bg-surface/95 backdrop-blur-xl border-t border-border;
+    @apply px-6 py-4;
+  }
+
+  .submit-bar-content {
+    @apply max-w-7xl mx-auto flex items-center justify-between;
+  }
+
+  /* ============================================
+     LOADING STATES
+     ============================================ */
+  .skeleton {
+    @apply animate-pulse bg-surface-hover rounded;
+  }
+
+  .loading-spinner {
+    @apply w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ============================================
+     SCROLLBAR
+     ============================================ */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-surface-muted rounded;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-border rounded;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-strong;
   }
 }
 
 @layer utilities {
-  /* Hide scrollbar but keep functionality */
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -357,57 +609,24 @@
     display: none;
   }
 
-  /* Text balance for better headings */
-  .text-balance {
-    text-wrap: balance;
+  /* Glow effects */
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
   }
 
-  /* Animate on scroll */
-  .animate-in {
-    animation: animate-in 0.4s ease-out;
+  .glow-success {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
   }
 
-  @keyframes animate-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  /* Animation delays */
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
 
-  /* Stagger animation delay utilities */
-  .animate-delay-100 { animation-delay: 100ms; }
-  .animate-delay-200 { animation-delay: 200ms; }
-  .animate-delay-300 { animation-delay: 300ms; }
-  .animate-delay-400 { animation-delay: 400ms; }
-
-  /* Pulse animation for loading states */
-  .pulse-subtle {
-    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  @keyframes pulse-subtle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-  }
-
-  /* Gradient text utility */
-  .gradient-text {
-    background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Glass effect */
-  .glass {
-    @apply bg-white/80 backdrop-blur-xl;
-  }
-
-  .glass-dark {
-    @apply bg-gray-900/80 backdrop-blur-xl;
+  /* Monospace numbers */
+  .mono-nums {
+    font-feature-settings: 'tnum' 1;
+    font-variant-numeric: tabular-nums;
   }
 }

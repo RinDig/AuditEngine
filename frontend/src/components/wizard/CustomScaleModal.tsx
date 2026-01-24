@@ -135,7 +135,7 @@ export function CustomScaleModal({
         {/* Basic Info Section */}
         <div className="space-y-4">
           <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">1</span>
+            <span className="w-5 h-5 rounded-full bg-accent/20 text-accent flex items-center justify-center text-xs font-mono">1</span>
             Basic Information
           </h4>
 
@@ -173,9 +173,9 @@ export function CustomScaleModal({
         </div>
 
         {/* Scale Range Section */}
-        <div className="space-y-4 pt-4 border-t border-gray-100">
+        <div className="space-y-4 pt-4 border-t border-border">
           <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">2</span>
+            <span className="w-5 h-5 rounded-full bg-accent/20 text-accent flex items-center justify-center text-xs font-mono">2</span>
             Response Scale
           </h4>
 
@@ -210,21 +210,21 @@ export function CustomScaleModal({
             </div>
           </div>
 
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-xs text-text-secondary">
-              Response range: <span className="font-semibold">{scaleMin}</span> to <span className="font-semibold">{scaleMax}</span> (Likert scale)
+          <div className="p-3 bg-surface-muted rounded border border-border">
+            <p className="text-xs text-text-secondary font-mono">
+              Response range: <span className="font-semibold text-accent">{scaleMin}</span> to <span className="font-semibold text-accent">{scaleMax}</span> (Likert scale)
             </p>
           </div>
         </div>
 
         {/* Items Section */}
-        <div className="space-y-4 pt-4 border-t border-gray-100">
+        <div className="space-y-4 pt-4 border-t border-border">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">3</span>
+              <span className="w-5 h-5 rounded-full bg-accent/20 text-accent flex items-center justify-center text-xs font-mono">3</span>
               Scale Items
             </h4>
-            <span className="text-xs text-text-tertiary">
+            <span className="text-xs text-text-tertiary font-mono">
               {validItemCount} item{validItemCount !== 1 ? 's' : ''}
             </span>
           </div>
@@ -233,17 +233,17 @@ export function CustomScaleModal({
             {items.map((item, index) => (
               <div
                 key={item.key}
-                className="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-3"
+                className="p-3 bg-surface-muted rounded border border-border space-y-3"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-tertiary">
+                  <span className="text-xs font-semibold text-text-tertiary font-mono">
                     Item {index + 1}
                   </span>
                   {items.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeItem(item.key)}
-                      className="p-1 text-text-tertiary hover:text-status-error hover:bg-red-50 rounded transition-colors"
+                      className="p-1 text-text-tertiary hover:text-status-error hover:bg-status-error/10 rounded transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -258,7 +258,7 @@ export function CustomScaleModal({
                       placeholder="ID"
                       value={item.id}
                       onChange={(e) => updateItem(item.key, 'id', e.target.value)}
-                      className="text-xs font-mono"
+                      mono
                     />
                   </div>
                   <div className="col-span-3">
@@ -277,7 +277,7 @@ export function CustomScaleModal({
                     type="checkbox"
                     checked={item.reverse_score}
                     onChange={(e) => updateItem(item.key, 'reverse_score', e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent"
+                    className="checkbox"
                   />
                   <span className="text-xs text-text-secondary">Reverse scored</span>
                 </label>
@@ -288,7 +288,7 @@ export function CustomScaleModal({
           <button
             type="button"
             onClick={addItem}
-            className="w-full p-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-text-tertiary hover:border-accent hover:text-accent hover:bg-accent/5 transition-colors"
+            className="w-full p-3 border border-dashed border-border rounded text-sm font-medium text-text-tertiary hover:border-accent hover:text-accent hover:bg-accent/5 transition-colors"
           >
             <svg className="w-4 h-4 inline mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -299,9 +299,9 @@ export function CustomScaleModal({
 
         {/* Error Display */}
         {errors.length > 0 && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-            <h5 className="text-sm font-semibold text-red-800 mb-2">Please fix the following:</h5>
-            <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+          <div className="p-4 bg-status-error/10 border border-status-error/30 rounded">
+            <h5 className="text-sm font-semibold text-status-error mb-2">Please fix the following:</h5>
+            <ul className="list-disc list-inside text-sm text-status-error/80 space-y-1">
               {errors.map((error, i) => (
                 <li key={i}>{error}</li>
               ))}
@@ -311,7 +311,7 @@ export function CustomScaleModal({
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-4">
+      <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
         <Button variant="ghost" onClick={handleClose}>
           Cancel
         </Button>

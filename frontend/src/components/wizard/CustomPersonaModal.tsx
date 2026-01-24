@@ -144,19 +144,19 @@ export function CustomPersonaModal({
 
         {/* Preview */}
         {promptPrefix.trim() && (
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div className="p-4 bg-surface-muted rounded border border-border">
             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">
               Preview
             </p>
-            <div className="text-sm text-text-secondary">
-              <span className="text-accent font-medium">{promptPrefix.trim()}</span>
+            <div className="text-sm text-text-secondary font-mono">
+              <span className="text-accent">{promptPrefix.trim()}</span>
               <span className="text-text-tertiary"> + [Question text]</span>
             </div>
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+        <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="ghost" onClick={handleClose}>
             Cancel
           </Button>
